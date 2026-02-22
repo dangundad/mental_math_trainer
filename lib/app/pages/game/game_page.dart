@@ -6,13 +6,22 @@ import 'package:mental_math_trainer/app/controllers/game_controller.dart';
 import 'package:mental_math_trainer/app/pages/game/widgets/number_pad.dart';
 import 'package:mental_math_trainer/app/pages/game/widgets/result_dialog.dart';
 
-class GamePage extends GetView<GameController> {
+class GamePage extends StatefulWidget {
   const GamePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Watch for round result
-    ever(controller.phase, (phase) {
+  State<GamePage> createState() => _GamePageState();
+}
+
+class _GamePageState extends State<GamePage> {
+  late final GameController controller;
+  Worker? _phaseWorker;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.find<GameController>();
+    _phaseWorker = ever(controller.phase, (phase) {
       if (phase == RoundPhase.result) {
         Future.delayed(const Duration(milliseconds: 200), () {
           if (Get.isDialogOpen != true) {
@@ -21,7 +30,16 @@ class GamePage extends GetView<GameController> {
         });
       }
     });
+  }
 
+  @override
+  void dispose() {
+    _phaseWorker?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(

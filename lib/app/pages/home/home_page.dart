@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import 'package:mental_math_trainer/app/admob/ads_banner.dart';
+import 'package:mental_math_trainer/app/admob/ads_helper.dart';
 import 'package:mental_math_trainer/app/controllers/game_controller.dart';
 import 'package:mental_math_trainer/app/data/enums/difficulty.dart';
 import 'package:mental_math_trainer/app/data/enums/operation.dart';
@@ -18,42 +20,52 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: cs.surface,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 16.h),
-              _Header(),
-              SizedBox(height: 24.h),
-              _StatsRow(controller: controller),
-              SizedBox(height: 28.h),
-              Text(
-                'difficulty'.tr,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  color: cs.onSurface,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 16.h),
+                    _Header(),
+                    SizedBox(height: 24.h),
+                    _StatsRow(controller: controller),
+                    SizedBox(height: 28.h),
+                    Text(
+                      'difficulty'.tr,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                        color: cs.onSurface,
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+                    _DifficultySelector(controller: controller),
+                    SizedBox(height: 24.h),
+                    Text(
+                      'operations'.tr,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                        color: cs.onSurface,
+                      ),
+                    ),
+                    SizedBox(height: 10.h),
+                    _OperationSelector(controller: controller),
+                    SizedBox(height: 32.h),
+                    _StartButton(controller: controller),
+                    SizedBox(height: 24.h),
+                  ],
                 ),
               ),
-              SizedBox(height: 10.h),
-              _DifficultySelector(controller: controller),
-              SizedBox(height: 24.h),
-              Text(
-                'operations'.tr,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  color: cs.onSurface,
-                ),
-              ),
-              SizedBox(height: 10.h),
-              _OperationSelector(controller: controller),
-              SizedBox(height: 32.h),
-              _StartButton(controller: controller),
-              SizedBox(height: 24.h),
-            ],
-          ),
+            ),
+            BannerAdWidget(
+              adUnitId: AdHelper.bannerAdUnitId,
+              type: AdHelper.banner,
+            ),
+          ],
         ),
       ),
     );
