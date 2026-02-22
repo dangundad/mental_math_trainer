@@ -9,8 +9,9 @@
 import 'package:get/get.dart';
 
 import 'package:mental_math_trainer/app/bindings/app_binding.dart';
+import 'package:mental_math_trainer/app/controllers/game_controller.dart';
+import 'package:mental_math_trainer/app/pages/game/game_page.dart';
 import 'package:mental_math_trainer/app/pages/home/home_page.dart';
-// import 'package:mental_math_trainer/app/pages/settings/settings_page.dart';
 
 part 'app_routes.dart';
 
@@ -25,13 +26,14 @@ class AppPages {
       page: () => const HomePage(),
       binding: AppBinding(),
     ),
-    // GetPage(
-    //   name: _Paths.SETTINGS,
-    //   page: () => const SettingsPage(),
-    //   binding: BindingsBuilder(() {
-    //     Get.lazyPut(() => SettingController());
-    //   }),
-    // ),
-    // ---- 앱별 페이지 추가 ----
+    GetPage(
+      name: _Paths.GAME,
+      page: () => const GamePage(),
+      binding: BindingsBuilder(() {
+        if (!Get.isRegistered<GameController>()) {
+          Get.put(GameController(), permanent: true);
+        }
+      }),
+    ),
   ];
 }

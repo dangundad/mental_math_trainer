@@ -12,11 +12,11 @@ abstract class Routes {
 
   static const HOME = _Paths.HOME;
   static const SETTINGS = _Paths.SETTINGS;
-  // ---- 앱별 라우트 추가 ----
+  static const GAME = _Paths.GAME;
 }
 
 abstract class _Paths {
   static const HOME = '/home';
   static const SETTINGS = '/settings';
-  // ---- 앱별 경로 추가 ----
+  static const GAME = '/game';
 }
