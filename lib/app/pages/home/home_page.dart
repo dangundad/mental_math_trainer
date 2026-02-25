@@ -180,6 +180,13 @@ class _StatsRow extends StatelessWidget {
         gradient: LinearGradient(
           colors: [cs.primaryContainer, cs.secondaryContainer],
         ),
+        boxShadow: [
+          BoxShadow(
+            color: cs.primary.withValues(alpha: 0.18),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Obx(
         () {
@@ -501,30 +508,56 @@ class _StartButtonState extends State<_StartButton> with SingleTickerProviderSta
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return AnimatedBuilder(
       animation: _pulseAnim,
       builder: (context, child) => Transform.scale(
         scale: _pulseAnim.value,
         child: child,
       ),
-      child: SizedBox(
+      child: Container(
         width: double.infinity,
-        height: 56.h,
-        child: FilledButton.icon(
-          style: FilledButton.styleFrom(
-            minimumSize: Size.fromHeight(56.h),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.r),
-            ),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [cs.primary, cs.tertiary],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
           ),
-          onPressed: () {
-            widget.controller.startRound();
-            Get.toNamed(Routes.GAME);
-          },
-          icon: Icon(Icons.play_arrow_rounded, size: 28.r),
-          label: Text(
-            'start_round'.tr,
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: cs.primary.withValues(alpha: 0.35),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16.r),
+            onTap: () {
+              widget.controller.startRound();
+              Get.toNamed(Routes.GAME);
+            },
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.play_arrow_rounded, size: 28.r, color: cs.onPrimary),
+                  SizedBox(width: 10.w),
+                  Text(
+                    'start_round'.tr,
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      color: cs.onPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
