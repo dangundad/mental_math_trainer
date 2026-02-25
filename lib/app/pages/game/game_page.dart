@@ -6,22 +6,31 @@ import 'package:mental_math_trainer/app/controllers/game_controller.dart';
 import 'package:mental_math_trainer/app/pages/game/widgets/number_pad.dart';
 import 'package:mental_math_trainer/app/pages/game/widgets/result_dialog.dart';
 
-class GamePage extends StatefulWidget {
+class GamePage extends GetView<GameController> {
   const GamePage({super.key});
 
   @override
-  State<GamePage> createState() => _GamePageState();
+  Widget build(BuildContext context) {
+    return _GamePageContent(controller: controller);
+  }
 }
 
-class _GamePageState extends State<GamePage> {
-  late final GameController controller;
+class _GamePageContent extends StatefulWidget {
+  final GameController controller;
+
+  const _GamePageContent({required this.controller});
+
+  @override
+  State<_GamePageContent> createState() => _GamePageState();
+}
+
+class _GamePageState extends State<_GamePageContent> {
   Worker? _phaseWorker;
 
   @override
   void initState() {
     super.initState();
-    controller = Get.find<GameController>();
-    _phaseWorker = ever(controller.phase, (phase) {
+    _phaseWorker = ever(widget.controller.phase, (phase) {
       if (phase == RoundPhase.result) {
         Future.delayed(const Duration(milliseconds: 200), () {
           if (Get.isDialogOpen != true) {
@@ -45,8 +54,8 @@ class _GamePageState extends State<GamePage> {
     return Scaffold(
       appBar: AppBar(
         title: Obx(
-          () => Text(
-            '${'question'.tr} ${controller.questionIndex.value + 1} / ${controller.roundTotal}',
+              () => Text(
+            '${'question'.tr} ${widget.controller.questionIndex.value + 1} / ${widget.controller.roundTotal}',
           ),
         ),
         centerTitle: true,
@@ -57,22 +66,22 @@ class _GamePageState extends State<GamePage> {
           child: Column(
             children: [
               SizedBox(height: 12.h),
-              _TimerBar(controller: controller),
+              _TimerBar(controller: widget.controller),
               SizedBox(height: 24.h),
-              _QuestionDisplay(controller: controller),
+              _QuestionDisplay(controller: widget.controller),
               SizedBox(height: 16.h),
-              _FeedbackArea(controller: controller),
+              _FeedbackArea(controller: widget.controller),
               const Spacer(),
-              _InputDisplay(controller: controller, cs: cs),
+              _InputDisplay(controller: widget.controller, cs: cs),
               SizedBox(height: 16.h),
               NumberPad(
-                onDigit: controller.appendDigit,
-                onBackspace: controller.backspace,
-                onSubmit: controller.submitAnswer,
+                onDigit: widget.controller.appendDigit,
+                onBackspace: widget.controller.backspace,
+                onSubmit: widget.controller.submitAnswer,
                 allowNegative: true,
               ),
               SizedBox(height: 12.h),
-              ConfirmButton(onTap: controller.submitAnswer),
+              ConfirmButton(onTap: widget.controller.submitAnswer),
               SizedBox(height: 16.h),
             ],
           ),
