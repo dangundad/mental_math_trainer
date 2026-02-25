@@ -1,7 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mental_math_trainer/main.dart';
 
 void main() {
-  testWidgets('placeholder test', (WidgetTester tester) async {
-    expect(true, isTrue);
+  testWidgets('mental_math_trainer smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(const MentalMathTrainerApp());
+
+    expect(find.byType(MentalMathTrainerApp), findsOneWidget);
   });
 }
