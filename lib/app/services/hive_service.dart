@@ -65,25 +65,33 @@ class HiveService extends GetxService {
   }
 
   // ============================================
-  // 앱별 데이터 CRUD 추가
+  // 주간 일별 정답 수 기록 (key: 'mm_daily_correct_{yyyy-MM-dd}')
   // ============================================
-  // 캐싱 패턴 예시:
-  //
-  // List<MyModel>? _cache;
-  //
-  // void _invalidateCache() { _cache = null; }
-  //
-  // List<MyModel> getAllItems({bool forceRefresh = false}) {
-  //   if (!forceRefresh && _cache != null) return List.from(_cache!);
-  //   final items = myModelBox.values.toList();
-  //   _cache = items;
-  //   return List.from(items);
-  // }
-  //
-  // Future<void> addItem(MyModel item) async {
-  //   await myModelBox.put(item.id, item);
-  //   _invalidateCache();
-  // }
+
+  static const String _dailyCorrectPrefix = 'mm_daily_correct_';
+
+  int getDailyCorrect(String dateKey) {
+    return appDataBox.get('$_dailyCorrectPrefix$dateKey', defaultValue: 0) as int;
+  }
+
+  Future<void> addDailyCorrect(String dateKey, int correct) async {
+    final current = getDailyCorrect(dateKey);
+    await appDataBox.put('$_dailyCorrectPrefix$dateKey', current + correct);
+  }
+
+  /// 최근 7일 날짜키 → 정답 수 맵 반환
+  Map<String, int> getWeeklyCorrect() {
+    final result = <String, int>{};
+    final now = DateTime.now();
+    for (int i = 6; i >= 0; i--) {
+      final date = now.subtract(Duration(days: i));
+      final key = '${date.year.toString().padLeft(4, '0')}-'
+          '${date.month.toString().padLeft(2, '0')}-'
+          '${date.day.toString().padLeft(2, '0')}';
+      result[key] = getDailyCorrect(key);
+    }
+    return result;
+  }
 
   // ============================================
   // 데이터 관리

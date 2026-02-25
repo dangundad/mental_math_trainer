@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -75,6 +76,8 @@ class StatsPage extends GetView<StatsController> {
                           ],
                         ),
                         SizedBox(height: 16.h),
+                        _WeeklyChart(cs: cs, controller: controller),
+                        SizedBox(height: 16.h),
                         _SectionCard(
                           cs: cs,
                           title: 'top_events'.tr,
@@ -115,6 +118,185 @@ class StatsPage extends GetView<StatsController> {
     );
   }
 }
+
+// ─── Weekly Bar Chart ─────────────────────────────────────
+
+class _WeeklyChart extends StatelessWidget {
+  final ColorScheme cs;
+  final StatsController controller;
+
+  const _WeeklyChart({required this.cs, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: 6.h),
+      padding: EdgeInsets.fromLTRB(14.w, 14.h, 14.w, 16.h),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(color: cs.outline.withValues(alpha: 0.35)),
+        boxShadow: [
+          BoxShadow(
+            color: cs.shadow.withValues(alpha: 0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'weekly_chart'.tr,
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w800,
+              color: cs.onSurface,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            'weekly_chart_subtitle'.tr,
+            style: TextStyle(
+              fontSize: 11.sp,
+              color: cs.onSurfaceVariant,
+            ),
+          ),
+          SizedBox(height: 16.h),
+          SizedBox(
+            height: 160.h,
+            child: Obx(() {
+              final data = controller.weeklyCorrect;
+              final keys = data.keys.toList();
+              final maxVal = data.values.fold(0, (a, b) => a > b ? a : b);
+              final maxY = maxVal < 5 ? 5.0 : (maxVal + 2).toDouble();
+
+              if (keys.isEmpty) {
+                return Center(
+                  child: Text(
+                    'no_data'.tr,
+                    style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13.sp),
+                  ),
+                );
+              }
+
+              final barGroups = keys.asMap().entries.map((entry) {
+                final i = entry.key;
+                final key = entry.value;
+                final val = (data[key] ?? 0).toDouble();
+                return BarChartGroupData(
+                  x: i,
+                  barRods: [
+                    BarChartRodData(
+                      toY: val,
+                      gradient: LinearGradient(
+                        colors: [cs.primary, cs.tertiary],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                      ),
+                      width: 22.w,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(6.r)),
+                      backDrawRodData: BackgroundBarChartRodData(
+                        show: true,
+                        toY: maxY,
+                        color: cs.surfaceContainerHigh.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ],
+                );
+              }).toList();
+
+              final dayLabels = keys.map((k) {
+                final parts = k.split('-');
+                if (parts.length != 3) return k;
+                final date = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+                const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                return weekdays[date.weekday - 1];
+              }).toList();
+
+              return BarChart(
+                BarChartData(
+                  maxY: maxY,
+                  minY: 0,
+                  barGroups: barGroups,
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: maxY / 5,
+                    getDrawingHorizontalLine: (value) => FlLine(
+                      color: cs.outline.withValues(alpha: 0.2),
+                      strokeWidth: 1,
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  titlesData: FlTitlesData(
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final idx = value.toInt();
+                          if (idx < 0 || idx >= dayLabels.length) {
+                            return const SizedBox.shrink();
+                          }
+                          return Padding(
+                            padding: EdgeInsets.only(top: 6.h),
+                            child: Text(
+                              dayLabels[idx],
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                color: cs.onSurfaceVariant,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          );
+                        },
+                        reservedSize: 26.h,
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30.w,
+                        interval: maxY / 5,
+                        getTitlesWidget: (value, meta) {
+                          if (value == 0 || value == maxY) return const SizedBox.shrink();
+                          return Text(
+                            value.toInt().toString(),
+                            style: TextStyle(fontSize: 9.sp, color: cs.onSurfaceVariant),
+                          );
+                        },
+                      ),
+                    ),
+                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  ),
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipColor: (_) => cs.inverseSurface,
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        return BarTooltipItem(
+                          '${rod.toY.toInt()}',
+                          TextStyle(
+                            color: cs.onInverseSurface,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12.sp,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Metric Card ──────────────────────────────────────────
 
 class _MetricData {
   final String label;
@@ -196,6 +378,8 @@ class _MetricCard extends StatelessWidget {
   }
 }
 
+// ─── Section Card ─────────────────────────────────────────
+
 class _SectionCard extends StatelessWidget {
   final ColorScheme cs;
   final String title;
@@ -237,6 +421,8 @@ class _SectionCard extends StatelessWidget {
     );
   }
 }
+
+// ─── Top Event Row ────────────────────────────────────────
 
 class _TopEventRow extends StatelessWidget {
   final String event;

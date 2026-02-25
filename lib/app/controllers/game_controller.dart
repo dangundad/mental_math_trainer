@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -50,6 +51,7 @@ class GameController extends GetxController {
   static const _todayDateKey = 'mm_today_date';
   static const _streakKey = 'mm_streak';
   static const _lastPlayedKey = 'mm_last_played';
+  static const _bestRoundCorrectKey = 'mm_best_round_correct';
 
   // Settings (observable)
   final difficulty = Difficulty.easy.obs;
@@ -70,6 +72,9 @@ class GameController extends GetxController {
   final todayCorrect = 0.obs;
   final todayQuestions = 0.obs;
   final streak = 0.obs;
+
+  // Confetti
+  final showConfetti = false.obs;
 
   Timer? _questionTimer;
   final _random = Random();
@@ -100,6 +105,7 @@ class GameController extends GetxController {
 
   // ─── Round flow ───────────────────────────────────────
   void startRound() {
+    showConfetti.value = false;
     roundResults.clear();
     questionIndex.value = 0;
     _roundCorrect = 0;
@@ -138,6 +144,7 @@ class GameController extends GetxController {
   void appendDigit(String digit) {
     if (phase.value != RoundPhase.question) return;
     if (userInput.value.length >= 5) return;
+    HapticFeedback.selectionClick();
     // Handle negative sign
     if (digit == '-') {
       if (userInput.value.isEmpty) {
@@ -172,7 +179,12 @@ class GameController extends GetxController {
   void _recordAnswer({required bool correct}) {
     lastAnswerCorrect.value = correct;
     roundResults.add(correct);
-    if (correct) _roundCorrect++;
+    if (correct) {
+      _roundCorrect++;
+      HapticFeedback.lightImpact();
+    } else {
+      HapticFeedback.heavyImpact();
+    }
     phase.value = RoundPhase.feedback;
 
     // Show feedback for 800ms, then advance
@@ -188,7 +200,18 @@ class GameController extends GetxController {
   }
 
   void _endRound() {
-    _updateStats(_roundCorrect, difficulty.value.questionsPerRound);
+    HapticFeedback.mediumImpact();
+    final total = difficulty.value.questionsPerRound;
+    final isPerfect = _roundCorrect == total;
+    final prevBest = HiveService.to.getAppData<int>(_bestRoundCorrectKey) ?? 0;
+    final isNewBest = _roundCorrect > prevBest;
+    if (isNewBest) {
+      HiveService.to.setAppData(_bestRoundCorrectKey, _roundCorrect);
+    }
+    if (isPerfect || isNewBest) {
+      showConfetti.value = true;
+    }
+    _updateStats(_roundCorrect, total);
     phase.value = RoundPhase.result;
     InterstitialAdManager.to.showAdIfAvailable();
   }
@@ -291,6 +314,9 @@ class GameController extends GetxController {
     HiveService.to.setAppData(_totalQuestionsKey, totalQuestions.value);
     HiveService.to.setAppData(_todayCorrectKey, todayCorrect.value);
     HiveService.to.setAppData(_todayQuestionsKey, todayQuestions.value);
+
+    // 일별 정답 수 누적 저장 (주간 차트용)
+    HiveService.to.addDailyCorrect(today, correct);
   }
 
   String _todayKey() => DateFormat('yyyy-MM-dd').format(DateTime.now());

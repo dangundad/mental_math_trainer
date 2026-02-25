@@ -45,6 +45,8 @@ class Languages extends Translations {
       'unique_routes': 'Routes',
       'unique_screens': 'Screens',
       'top_events': 'Top Events',
+      'weekly_chart': 'Weekly Correct Answers',
+      'weekly_chart_subtitle': 'Correct answers per day (last 7 days)',
 
       // Settings
       'dark_mode': 'Dark Mode',
@@ -140,6 +142,8 @@ class Languages extends Translations {
       'unique_routes': '고유 경로',
       'unique_screens': '고유 화면',
       'top_events': '상위 이벤트',
+      'weekly_chart': '주간 정답 수',
+      'weekly_chart_subtitle': '최근 7일간 일별 정답 수',
       // 설정
       'dark_mode': '다크 모드',
       'language': '언어',

@@ -1,6 +1,7 @@
 ﻿import 'package:get/get.dart';
 
 import 'package:mental_math_trainer/app/services/activity_log_service.dart';
+import 'package:mental_math_trainer/app/services/hive_service.dart';
 
 class StatsController extends GetxController {
   static const String appId = 'mental_math_trainer';
@@ -15,6 +16,9 @@ class StatsController extends GetxController {
   final RxInt openStatsCount = 0.obs;
   final RxList<String> topEventNames = <String>[].obs;
   final RxMap<String, int> eventCountMap = <String, int>{}.obs;
+
+  // 주간 차트 데이터 (날짜키 → 정답 수)
+  final weeklyCorrect = <String, int>{}.obs;
 
   @override
   void onInit() {
@@ -67,6 +71,9 @@ class StatsController extends GetxController {
     eventCountMap.assignAll(eventCount);
     topEventNames.assignAll(sorted.take(8).map((item) => item.key).toList());
     openStatsCount.value = eventCount['open_stats'] ?? 0;
+
+    // 주간 정답 수 차트 데이터
+    weeklyCorrect.assignAll(HiveService.to.getWeeklyCorrect());
   }
 
   static DateTime _parseDate(dynamic value) {
