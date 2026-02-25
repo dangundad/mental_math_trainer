@@ -40,6 +40,8 @@ class Question {
 
 enum RoundPhase { idle, question, feedback, result }
 
+enum GameMode { normal, challenge }
+
 class GameController extends GetxController {
   static GameController get to => Get.find();
 
@@ -52,10 +54,12 @@ class GameController extends GetxController {
   static const _streakKey = 'mm_streak';
   static const _lastPlayedKey = 'mm_last_played';
   static const _bestRoundCorrectKey = 'mm_best_round_correct';
+  static const _bestChallengeScoreKey = 'mm_best_challenge_score';
 
   // Settings (observable)
   final difficulty = Difficulty.easy.obs;
   final selectedOps = <Operation>{Operation.addition}.obs;
+  final gameMode = GameMode.normal.obs;
 
   // Game state
   final phase = RoundPhase.idle.obs;
@@ -66,17 +70,26 @@ class GameController extends GetxController {
   final lastAnswerCorrect = false.obs;
   final roundResults = <bool>[].obs;
 
+  // Challenge mode state
+  static const challengeDurationSeconds = 60;
+  final challengeTimeLeft = challengeDurationSeconds.obs; // seconds remaining
+  final challengeCorrect = 0.obs;
+  final challengeTotal = 0.obs;
+  final isNewChallengeRecord = false.obs;
+
   // Stats
   final totalCorrect = 0.obs;
   final totalQuestions = 0.obs;
   final todayCorrect = 0.obs;
   final todayQuestions = 0.obs;
   final streak = 0.obs;
+  final bestChallengeScore = 0.obs;
 
   // Confetti
   final showConfetti = false.obs;
 
   Timer? _questionTimer;
+  Timer? _challengeCountdown;
   final _random = Random();
   int _roundCorrect = 0;
 
@@ -89,6 +102,7 @@ class GameController extends GetxController {
   @override
   void onClose() {
     _questionTimer?.cancel();
+    _challengeCountdown?.cancel();
     super.onClose();
   }
 
@@ -105,11 +119,54 @@ class GameController extends GetxController {
 
   // ─── Round flow ───────────────────────────────────────
   void startRound() {
+    gameMode.value = GameMode.normal;
     showConfetti.value = false;
     roundResults.clear();
     questionIndex.value = 0;
     _roundCorrect = 0;
     _nextQuestion();
+  }
+
+  // ─── Challenge flow ───────────────────────────────────
+  void startChallenge() {
+    gameMode.value = GameMode.challenge;
+    showConfetti.value = false;
+    isNewChallengeRecord.value = false;
+    challengeCorrect.value = 0;
+    challengeTotal.value = 0;
+    challengeTimeLeft.value = challengeDurationSeconds;
+    roundResults.clear();
+    questionIndex.value = 0;
+    _roundCorrect = 0;
+    _startChallengeCountdown();
+    _nextQuestion();
+  }
+
+  void _startChallengeCountdown() {
+    _challengeCountdown?.cancel();
+    _challengeCountdown = Timer.periodic(const Duration(seconds: 1), (t) {
+      final left = challengeTimeLeft.value - 1;
+      challengeTimeLeft.value = left;
+      if (left <= 0) {
+        t.cancel();
+        _endChallenge();
+      }
+    });
+  }
+
+  void _endChallenge() {
+    _questionTimer?.cancel();
+    final prevBest = bestChallengeScore.value;
+    final score = challengeCorrect.value;
+    if (score > prevBest) {
+      bestChallengeScore.value = score;
+      HiveService.to.setAppData(_bestChallengeScoreKey, score);
+      isNewChallengeRecord.value = true;
+      showConfetti.value = true;
+    }
+    _updateStats(score, challengeTotal.value);
+    phase.value = RoundPhase.result;
+    InterstitialAdManager.to.showAdIfAvailable();
   }
 
   void _nextQuestion() {
@@ -122,6 +179,11 @@ class GameController extends GetxController {
 
   void _startTimer() {
     _questionTimer?.cancel();
+    // In challenge mode there is no per-question time limit
+    if (gameMode.value == GameMode.challenge) {
+      timeProgress.value = 1.0;
+      return;
+    }
     const tickMs = 100;
     final totalTicks = difficulty.value.timePerQuestion * 10; // 10 ticks/s
     int elapsed = 0;
@@ -169,6 +231,8 @@ class GameController extends GetxController {
 
   void submitAnswer() {
     if (phase.value != RoundPhase.question) return;
+    // In challenge mode, block submission after time is up
+    if (gameMode.value == GameMode.challenge && challengeTimeLeft.value <= 0) return;
     final parsed = int.tryParse(userInput.value);
     if (parsed == null) return;
     _questionTimer?.cancel();
@@ -181,10 +245,24 @@ class GameController extends GetxController {
     roundResults.add(correct);
     if (correct) {
       _roundCorrect++;
+      if (gameMode.value == GameMode.challenge) {
+        challengeCorrect.value++;
+      }
       HapticFeedback.lightImpact();
     } else {
       HapticFeedback.heavyImpact();
     }
+
+    if (gameMode.value == GameMode.challenge) {
+      challengeTotal.value++;
+      // Challenge: no feedback pause — go straight to next question
+      if (challengeTimeLeft.value > 0) {
+        questionIndex.value++;
+        _nextQuestion();
+      }
+      return;
+    }
+
     phase.value = RoundPhase.feedback;
 
     // Show feedback for 800ms, then advance
@@ -269,6 +347,8 @@ class GameController extends GetxController {
     totalQuestions.value =
         HiveService.to.getAppData<int>(_totalQuestionsKey) ?? 0;
     streak.value = HiveService.to.getAppData<int>(_streakKey) ?? 0;
+    bestChallengeScore.value =
+        HiveService.to.getAppData<int>(_bestChallengeScoreKey) ?? 0;
 
     final today = _todayKey();
     final storedDate = HiveService.to.getAppData<String>(_todayDateKey) ?? '';

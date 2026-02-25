@@ -57,6 +57,8 @@ class HomePage extends GetView<GameController> {
                       _OperationSelector(controller: controller),
                       SizedBox(height: 24.h),
                       _StartButton(controller: controller),
+                      SizedBox(height: 12.h),
+                      _ChallengeButton(controller: controller),
                       SizedBox(height: 24.h),
                     ],
                   ),
@@ -471,6 +473,76 @@ class _OpChip extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _ChallengeButton extends StatelessWidget {
+  final GameController controller;
+
+  const _ChallengeButton({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Obx(() {
+      final best = controller.bestChallengeScore.value;
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: const Color(0xFFE65100).withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: const Color(0xFFE65100), width: 1.5),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16.r),
+            onTap: () {
+              controller.startChallenge();
+              Get.toNamed(Routes.GAME);
+            },
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 20.w),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('⚡', style: TextStyle(fontSize: 22.sp)),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'challenge_mode'.tr,
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFFE65100),
+                          ),
+                        ),
+                        if (best > 0)
+                          Text(
+                            '${'best_challenge_score'.tr}: $best',
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: const Color(0xFFE65100),
+                    size: 22.r,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 }
 

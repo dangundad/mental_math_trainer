@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:mental_math_trainer/app/controllers/game_controller.dart';
 import 'package:mental_math_trainer/app/pages/game/widgets/number_pad.dart';
 import 'package:mental_math_trainer/app/pages/game/widgets/result_dialog.dart';
+import 'package:mental_math_trainer/app/widgets/confetti_overlay.dart';
 
 class GamePage extends GetView<GameController> {
   const GamePage({super.key});
@@ -47,44 +48,90 @@ class _GamePageState extends State<_GamePageContent> {
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: Obx(
-              () => Text(
-            '${'question'.tr} ${widget.controller.questionIndex.value + 1} / ${widget.controller.roundTotal}',
-          ),
-        ),
+        title: Obx(() {
+          final ctrl = widget.controller;
+          if (ctrl.gameMode.value == GameMode.challenge) {
+            return Text('challenge_mode'.tr);
+          }
+          return Text(
+            '${'question'.tr} ${ctrl.questionIndex.value + 1} / ${ctrl.roundTotal}',
+          );
+        }),
         centerTitle: true,
+        actions: [
+          Obx(() {
+            if (widget.controller.gameMode.value != GameMode.challenge) {
+              return const SizedBox.shrink();
+            }
+            final left = widget.controller.challengeTimeLeft.value;
+            final color = left <= 10
+                ? const Color(0xFFC62828)
+                : left <= 20
+                    ? Colors.orange
+                    : null;
+            return Padding(
+              padding: EdgeInsets.only(right: 16.w),
+              child: Center(
+                child: Text(
+                  '${left}s',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w800,
+                    color: color,
+                  ),
+                ),
+              ),
+            );
+          }),
+        ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: Column(
-            children: [
-              SizedBox(height: 12.h),
-              _TimerBar(controller: widget.controller),
-              SizedBox(height: 24.h),
-              _QuestionDisplay(controller: widget.controller),
-              SizedBox(height: 16.h),
-              _FeedbackArea(controller: widget.controller),
-              const Spacer(),
-              _InputDisplay(controller: widget.controller, cs: cs),
-              SizedBox(height: 16.h),
-              NumberPad(
-                onDigit: widget.controller.appendDigit,
-                onBackspace: widget.controller.backspace,
-                onSubmit: widget.controller.submitAnswer,
-                allowNegative: true,
+        child: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: Column(
+                children: [
+                  SizedBox(height: 12.h),
+                  _TimerBar(controller: widget.controller),
+                  SizedBox(height: 24.h),
+                  _QuestionDisplay(controller: widget.controller),
+                  SizedBox(height: 16.h),
+                  _FeedbackArea(controller: widget.controller),
+                  const Spacer(),
+                  _InputDisplay(controller: widget.controller, cs: cs),
+                  SizedBox(height: 16.h),
+                  NumberPad(
+                    onDigit: widget.controller.appendDigit,
+                    onBackspace: widget.controller.backspace,
+                    onSubmit: widget.controller.submitAnswer,
+                    allowNegative: true,
+                  ),
+                  SizedBox(height: 12.h),
+                  ConfirmButton(onTap: widget.controller.submitAnswer),
+                  SizedBox(height: 16.h),
+                ],
               ),
-              SizedBox(height: 12.h),
-              ConfirmButton(onTap: widget.controller.submitAnswer),
-              SizedBox(height: 16.h),
-            ],
-          ),
+            ),
+            Obx(() {
+              if (!widget.controller.showConfetti.value) {
+                return const SizedBox.shrink();
+              }
+              return IgnorePointer(
+                child: ConfettiOverlay(
+                  onComplete: () =>
+                      widget.controller.showConfetti.value = false,
+                ),
+              );
+            }),
+          ],
         ),
       ),
     );

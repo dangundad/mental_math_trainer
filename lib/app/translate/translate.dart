@@ -111,6 +111,13 @@ class Languages extends Translations {
       'result_bonus': 'Watch ad for bonus round',
       'home': 'Home',
       'play_again': 'Play Again',
+
+      // Challenge mode
+      'challenge_mode': '60s Challenge',
+      'challenge_score': 'Correct Answers',
+      'challenge_result_title': '60s Challenge Complete!',
+      'best_challenge_score': 'Best Score',
+      'new_record': '🎉 New Record!',
     },
     'ko': {
       // 공통
@@ -205,6 +212,13 @@ class Languages extends Translations {
       'result_bonus': '광고 시청으로 보너스 라운드',
       'home': '홈',
       'play_again': '다시 하기',
+
+      // 도전 모드
+      'challenge_mode': '60초 도전',
+      'challenge_score': '정답 수',
+      'challenge_result_title': '60초 도전 완료!',
+      'best_challenge_score': '최고 기록',
+      'new_record': '🎉 신기록!',
     },
   };
 }
