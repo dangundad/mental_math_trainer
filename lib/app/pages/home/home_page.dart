@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:mental_math_trainer/app/admob/ads_banner.dart';
 import 'package:mental_math_trainer/app/admob/ads_helper.dart';
@@ -17,19 +18,41 @@ class HomePage extends GetView<GameController> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'app_name'.tr,
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18.sp),
+        ),
+        centerTitle: false,
+        backgroundColor: cs.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(3),
+          child: Container(
+            height: 3,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [cs.primary, cs.tertiary],
+              ),
+            ),
+          ),
+        ),
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              cs.primary.withValues(alpha: 0.14),
+              cs.primary.withValues(alpha: 0.08),
               cs.surface,
-              cs.secondaryContainer.withValues(alpha: 0.2),
+              cs.secondaryContainer.withValues(alpha: 0.15),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: SafeArea(
+          top: false,
           child: Column(
             children: [
               Expanded(
@@ -38,19 +61,19 @@ class HomePage extends GetView<GameController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _Header(),
+                      _HeroSection(),
                       SizedBox(height: 20.h),
                       _StatsRow(controller: controller),
                       SizedBox(height: 22.h),
                       _SectionTitle(
-                        icon: Icons.bar_chart_rounded,
+                        icon: LucideIcons.chartArea,
                         title: 'difficulty'.tr,
                       ),
                       SizedBox(height: 10.h),
                       _DifficultySelector(controller: controller),
                       SizedBox(height: 20.h),
                       _SectionTitle(
-                        icon: Icons.calculate_rounded,
+                        icon: LucideIcons.calculator,
                         title: 'operations'.tr,
                       ),
                       SizedBox(height: 10.h),
@@ -90,52 +113,60 @@ class HomePage extends GetView<GameController> {
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header();
-
+class _HeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Container(
-      padding: EdgeInsets.all(18.r),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: cs.outline.withValues(alpha: 0.22)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.9, end: 1),
-            duration: const Duration(milliseconds: 700),
-            curve: Curves.easeOutBack,
-            builder: (context, value, child) => Transform.scale(
-              scale: value,
-              child: child,
-            ),
-            child: Text(
-              '🧠',
-              style: TextStyle(fontSize: 40.sp),
-            ),
+    return Row(
+      children: [
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.7, end: 1.0),
+          duration: const Duration(milliseconds: 700),
+          curve: Curves.easeOutBack,
+          builder: (context, value, child) => Transform.scale(
+            scale: value,
+            child: child,
           ),
-          SizedBox(height: 10.h),
-          Text(
-            'app_name'.tr,
-            style: TextStyle(
-              fontSize: 28.sp,
-              fontWeight: FontWeight.w900,
-              color: cs.onSurface,
-              height: 1.1,
+          child: Container(
+            width: 110.r,
+            height: 110.r,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  cs.primaryContainer,
+                  cs.primaryContainer.withValues(alpha: 0.0),
+                ],
+              ),
+            ),
+            child: Center(
+              child: Icon(LucideIcons.calculator, size: 60.r, color: cs.primary),
             ),
           ),
-          SizedBox(height: 6.h),
-          Text(
-            'home_subtitle'.tr,
-            style: TextStyle(fontSize: 13.sp, color: cs.onSurfaceVariant),
+        ),
+        SizedBox(width: 16.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'app_name'.tr,
+                style: TextStyle(
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.w900,
+                  color: cs.onSurface,
+                  height: 1.1,
+                ),
+              ),
+              SizedBox(height: 6.h),
+              Text(
+                'home_subtitle'.tr,
+                style: TextStyle(fontSize: 13.sp, color: cs.onSurfaceVariant),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -178,15 +209,20 @@ class _StatsRow extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
         gradient: LinearGradient(
-          colors: [cs.primaryContainer, cs.secondaryContainer],
+          colors: [
+            cs.primaryContainer,
+            cs.secondaryContainer.withValues(alpha: 0.7),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: cs.primary.withValues(alpha: 0.18),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
+            color: cs.primary.withValues(alpha: 0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -335,8 +371,8 @@ class _DifficultyCard extends StatelessWidget {
         duration: const Duration(milliseconds: 170),
         padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.16) : cs.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(14.r),
+          color: isSelected ? color.withValues(alpha: 0.16) : cs.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             color: isSelected ? color : Colors.transparent,
             width: 2,
@@ -349,7 +385,13 @@ class _DifficultyCard extends StatelessWidget {
                     offset: const Offset(0, 6),
                   ),
                 ]
-              : null,
+              : [
+                  BoxShadow(
+                    color: cs.shadow.withValues(alpha: 0.06),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
         ),
         child: Column(
           children: [
@@ -431,12 +473,21 @@ class _OpChip extends StatelessWidget {
         duration: const Duration(milliseconds: 160),
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
         decoration: BoxDecoration(
-          color: isSelected ? cs.primaryContainer : cs.surfaceContainerHigh,
+          color: isSelected ? cs.primaryContainer : cs.surfaceContainerLow,
           borderRadius: BorderRadius.circular(24.r),
           border: Border.all(
             color: isSelected ? cs.primary : Colors.transparent,
             width: 2,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? cs.primary.withValues(alpha: 0.18)
+                  : cs.shadow.withValues(alpha: 0.06),
+              blurRadius: isSelected ? 10 : 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -489,14 +540,21 @@ class _ChallengeButton extends StatelessWidget {
       return Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFFE65100).withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(16.r),
+          color: const Color(0xFFE65100).withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(20.r),
           border: Border.all(color: const Color(0xFFE65100), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFE65100).withValues(alpha: 0.12),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(20.r),
             onTap: () {
               controller.startChallenge();
               Get.toNamed(Routes.GAME);
