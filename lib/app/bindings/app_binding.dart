@@ -12,6 +12,7 @@ import 'package:mental_math_trainer/app/services/activity_log_service.dart';
 import 'package:mental_math_trainer/app/services/hive_service.dart';
 
 import 'package:mental_math_trainer/app/services/purchase_service.dart';
+import 'package:mental_math_trainer/app/services/app_rating_service.dart';
 import 'package:mental_math_trainer/app/controllers/premium_controller.dart';
 
 class AppBinding implements Bindings {
@@ -78,6 +79,9 @@ class AppBinding implements Bindings {
     if (!Get.isRegistered<RewardedAdManager>()) {
       Get.put(RewardedAdManager(), permanent: true);
     }
+
+    if (!Get.isRegistered<AppRatingService>()) {
+      Get.put(AppRatingService(), permanent: true);
+    }
   }
 }
-
