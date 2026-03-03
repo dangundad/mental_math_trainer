@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:vibration/vibration.dart';
 import 'package:intl/intl.dart';
 
 import 'package:mental_math_trainer/app/admob/ads_interstitial.dart';
 import 'package:mental_math_trainer/app/admob/ads_rewarded.dart';
+import 'package:mental_math_trainer/app/controllers/setting_controller.dart';
 import 'package:mental_math_trainer/app/data/enums/difficulty.dart';
 import 'package:mental_math_trainer/app/data/enums/operation.dart';
 import 'package:mental_math_trainer/app/services/hive_service.dart';
@@ -88,6 +89,8 @@ class GameController extends GetxController {
   // Confetti
   final showConfetti = false.obs;
 
+  bool _hasVibrator = false;
+
   Timer? _questionTimer;
   Timer? _challengeCountdown;
   final _random = Random();
@@ -97,6 +100,7 @@ class GameController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    Vibration.hasVibrator().then((v) => _hasVibrator = v);
     _loadStats();
   }
 
@@ -218,7 +222,7 @@ class GameController extends GetxController {
   void appendDigit(String digit) {
     if (phase.value != RoundPhase.question) return;
     if (userInput.value.length >= 5) return;
-    HapticFeedback.selectionClick();
+    if (SettingController.to.hapticEnabled.value && _hasVibrator) Vibration.vibrate(duration: 30);
     // Handle negative sign
     if (digit == '-') {
       if (userInput.value.isEmpty) {
@@ -260,9 +264,9 @@ class GameController extends GetxController {
       if (gameMode.value == GameMode.challenge) {
         challengeCorrect.value++;
       }
-      HapticFeedback.lightImpact();
+      if (SettingController.to.hapticEnabled.value && _hasVibrator) Vibration.vibrate(duration: 50);
     } else {
-      HapticFeedback.heavyImpact();
+      if (SettingController.to.hapticEnabled.value && _hasVibrator) Vibration.vibrate(duration: 200);
     }
 
     if (gameMode.value == GameMode.challenge) {
@@ -298,7 +302,7 @@ class GameController extends GetxController {
   }
 
   void _endRound() {
-    HapticFeedback.mediumImpact();
+    if (SettingController.to.hapticEnabled.value && _hasVibrator) Vibration.vibrate(duration: 100);
     final total = difficulty.value.questionsPerRound;
     final isPerfect = _roundCorrect == total;
     final prevBest = HiveService.to.getAppData<int>(_bestRoundCorrectKey) ?? 0;
