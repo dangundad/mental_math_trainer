@@ -100,7 +100,7 @@ class _NumKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final bgColor = isDestructive
         ? cs.errorContainer
         : disabled

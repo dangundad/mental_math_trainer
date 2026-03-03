@@ -51,7 +51,7 @@ class _GamePageState extends State<_GamePageContent> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -173,7 +173,7 @@ class _TimerBarState extends State<_TimerBar>
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Obx(() {
       final progress = widget.controller.timeProgress.value.clamp(0.0, 1.0);
       final isUrgent = progress < 0.2;
@@ -223,7 +223,7 @@ class _QuestionDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Obx(() {
       final q = controller.currentQuestion.value;
       if (q == null) return const SizedBox.shrink();

@@ -15,7 +15,7 @@ class HomePage extends GetView<GameController> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -116,7 +116,7 @@ class HomePage extends GetView<GameController> {
 class _HeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Row(
       children: [
         TweenAnimationBuilder<double>(
@@ -179,7 +179,7 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Row(
       children: [
         Icon(icon, size: 18.r, color: cs.primary),
@@ -204,7 +204,7 @@ class _StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
 
     return Container(
       padding: EdgeInsets.all(16.r),
@@ -362,7 +362,7 @@ class _DifficultyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final color = _colors[difficulty]!;
 
     return GestureDetector(
@@ -463,7 +463,7 @@ class _OpChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final label = operation.labelKey.tr;
     final symbol = _fallbackSymbols[operation] ?? '+';
 
@@ -534,7 +534,7 @@ class _ChallengeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return Obx(() {
       final best = controller.bestChallengeScore.value;
       return Container(
@@ -638,7 +638,7 @@ class _StartButtonState extends State<_StartButton> with SingleTickerProviderSta
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     return AnimatedBuilder(
       animation: _pulseAnim,
       builder: (context, child) => Transform.scale(

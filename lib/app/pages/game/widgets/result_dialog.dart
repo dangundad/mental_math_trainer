@@ -23,7 +23,7 @@ class _NormalResultDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final correct = controller.roundCorrect;
     final total = controller.roundTotal;
     final accuracy = total > 0 ? (correct / total * 100).round() : 0;
@@ -135,7 +135,7 @@ class _ChallengeResultDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final score = controller.challengeCorrect.value;
     final total = controller.challengeTotal.value;
     final accuracy = total > 0 ? (score / total * 100).round() : 0;
@@ -261,7 +261,7 @@ class _StatRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final cs = Get.theme.colorScheme;
     final valueText = Text(
       value,
       style: TextStyle(

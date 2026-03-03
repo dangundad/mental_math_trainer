@@ -16,7 +16,7 @@ import 'package:mental_math_trainer/app/admob/ads_helper.dart';
 import 'package:mental_math_trainer/app/bindings/app_binding.dart';
 import 'package:mental_math_trainer/app/routes/app_pages.dart';
 import 'package:mental_math_trainer/app/services/hive_service.dart';
-import 'package:mental_math_trainer/app/theme/app_theme.dart';
+import 'package:mental_math_trainer/app/theme/app_flex_theme.dart';
 import 'package:mental_math_trainer/app/translate/translate.dart';
 
 Future<void> main() async {
@@ -70,8 +70,8 @@ class MentalMathTrainerApp extends StatelessWidget {
       fallbackLocale: const Locale('en'),
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
+      theme: AppFlexTheme.light,
+      darkTheme: AppFlexTheme.dark,
       home: const Scaffold(body: SizedBox.shrink()),
     );
   }
@@ -101,8 +101,8 @@ class MentalMathTrainerApp extends StatelessWidget {
           defaultTransition: Transition.fadeIn,
           initialBinding: AppBinding(),
           themeMode: ThemeMode.system,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
+          theme: AppFlexTheme.light,
+          darkTheme: AppFlexTheme.dark,
           scrollBehavior: ScrollBehavior().copyWith(overscroll: false),
           navigatorKey: Get.key,
           getPages: AppPages.routes,
