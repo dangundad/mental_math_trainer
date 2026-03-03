@@ -92,6 +92,7 @@ class GameController extends GetxController {
   Timer? _challengeCountdown;
   final _random = Random();
   int _roundCorrect = 0;
+  bool _challengeEnded = false;
 
   @override
   void onInit() {
@@ -119,16 +120,23 @@ class GameController extends GetxController {
 
   // ─── Round flow ───────────────────────────────────────
   void startRound() {
+    _questionTimer?.cancel();
+    _challengeCountdown?.cancel();
+    _challengeCountdown = null;
+    _challengeEnded = true; // prevent any in-flight challenge callback
     gameMode.value = GameMode.normal;
     showConfetti.value = false;
     roundResults.clear();
     questionIndex.value = 0;
     _roundCorrect = 0;
+    _challengeEnded = false;
     _nextQuestion();
   }
 
   // ─── Challenge flow ───────────────────────────────────
   void startChallenge() {
+    _questionTimer?.cancel();
+    _challengeCountdown?.cancel();
     gameMode.value = GameMode.challenge;
     showConfetti.value = false;
     isNewChallengeRecord.value = false;
@@ -138,6 +146,7 @@ class GameController extends GetxController {
     roundResults.clear();
     questionIndex.value = 0;
     _roundCorrect = 0;
+    _challengeEnded = false;
     _startChallengeCountdown();
     _nextQuestion();
   }
@@ -155,6 +164,8 @@ class GameController extends GetxController {
   }
 
   void _endChallenge() {
+    if (_challengeEnded) return;
+    _challengeEnded = true;
     _questionTimer?.cancel();
     final prevBest = bestChallengeScore.value;
     final score = challengeCorrect.value;
@@ -200,6 +211,7 @@ class GameController extends GetxController {
 
   void _onTimeUp() {
     _questionTimer?.cancel();
+    userInput.value = '';
     _recordAnswer(correct: false);
   }
 
@@ -255,8 +267,10 @@ class GameController extends GetxController {
 
     if (gameMode.value == GameMode.challenge) {
       challengeTotal.value++;
-      // Challenge: no feedback pause — go straight to next question
-      if (challengeTimeLeft.value > 0) {
+      // Challenge: no feedback pause — go straight to next question.
+      // Guard against race where the countdown fires _endChallenge at the
+      // same moment as an answer is submitted.
+      if (!_challengeEnded && challengeTimeLeft.value > 0) {
         questionIndex.value++;
         _nextQuestion();
       }
@@ -265,9 +279,15 @@ class GameController extends GetxController {
 
     phase.value = RoundPhase.feedback;
 
-    // Show feedback for 800ms, then advance
+    // Show feedback for 800ms, then advance.
+    // Capture the current questionIndex to detect stale delayed callbacks
+    // (e.g. if the user quickly navigates away and starts a new round).
+    final capturedIndex = questionIndex.value;
     Future.delayed(const Duration(milliseconds: 800), () {
-      final idx = questionIndex.value + 1;
+      // Discard if phase changed (e.g. round restarted) or index moved on.
+      if (phase.value != RoundPhase.feedback) return;
+      if (questionIndex.value != capturedIndex) return;
+      final idx = capturedIndex + 1;
       if (idx >= difficulty.value.questionsPerRound) {
         _endRound();
       } else {
