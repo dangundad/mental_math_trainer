@@ -65,6 +65,20 @@ class _GamePageState extends State<_GamePageContent> {
           );
         }),
         centerTitle: true,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: Get.theme.colorScheme.surface,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(3),
+          child: Container(
+            height: 3,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Get.theme.colorScheme.primary, Get.theme.colorScheme.tertiary],
+              ),
+            ),
+          ),
+        ),
         actions: [
           Obx(() {
             if (widget.controller.gameMode.value != GameMode.challenge) {
