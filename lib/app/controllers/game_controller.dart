@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:confetti/confetti.dart';
 import 'package:get/get.dart';
 import 'package:vibration/vibration.dart';
 import 'package:intl/intl.dart';
@@ -87,7 +88,7 @@ class GameController extends GetxController {
   final bestChallengeScore = 0.obs;
 
   // Confetti
-  final showConfetti = false.obs;
+  late final confettiController = ConfettiController(duration: const Duration(seconds: 2));
 
   bool _hasVibrator = false;
 
@@ -108,6 +109,7 @@ class GameController extends GetxController {
   void onClose() {
     _questionTimer?.cancel();
     _challengeCountdown?.cancel();
+    confettiController.dispose();
     super.onClose();
   }
 
@@ -129,7 +131,6 @@ class GameController extends GetxController {
     _challengeCountdown = null;
     _challengeEnded = true; // prevent any in-flight challenge callback
     gameMode.value = GameMode.normal;
-    showConfetti.value = false;
     roundResults.clear();
     questionIndex.value = 0;
     _roundCorrect = 0;
@@ -142,7 +143,6 @@ class GameController extends GetxController {
     _questionTimer?.cancel();
     _challengeCountdown?.cancel();
     gameMode.value = GameMode.challenge;
-    showConfetti.value = false;
     isNewChallengeRecord.value = false;
     challengeCorrect.value = 0;
     challengeTotal.value = 0;
@@ -177,7 +177,7 @@ class GameController extends GetxController {
       bestChallengeScore.value = score;
       HiveService.to.setAppData(_bestChallengeScoreKey, score);
       isNewChallengeRecord.value = true;
-      showConfetti.value = true;
+      confettiController.play();
     }
     _updateStats(score, challengeTotal.value);
     phase.value = RoundPhase.result;
@@ -311,7 +311,7 @@ class GameController extends GetxController {
       HiveService.to.setAppData(_bestRoundCorrectKey, _roundCorrect);
     }
     if (isPerfect || isNewBest) {
-      showConfetti.value = true;
+      confettiController.play();
     }
     _updateStats(_roundCorrect, total);
     phase.value = RoundPhase.result;
