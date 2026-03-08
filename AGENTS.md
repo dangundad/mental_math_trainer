@@ -1,96 +1,70 @@
-# CLAUDE.md - Mental Math Trainer
+# Mental Math Trainer 개발 가이드
 
-## 프로젝트 개요
-암산 훈련 앱. 사칙연산 문제를 제한 시간 내에 풀어 두뇌를 훈련하는 교육 앱.
-- **패키지명**: `com.dangundad.mentalmathtrainer`
-- **퍼블리셔**: DangunDad
-- **수익 모델**: 완전 무료 + AdMob 광고 (배너 + 전면 + 보상형)
+> 문서: `AGENTS.md`
+> This file provides guidance to coding agents working with this repository.
+> 최종 업데이트: 2026-03-08
+> 기준: 현재 앱 저장소 스캔 + `C:\Flutter_WorkSpace\Flutter_Plan\AGENTS.md` 포트폴리오 상태표
 
-## 기술 스택
-- **Flutter** 3.x / Dart 3.8+
-- **상태 관리**: GetX (`GetxController`, `.obs`, `Obx()`)
-- **로컬 저장**: Hive_CE (키-값 저장)
-- **UI**: flutter_screenutil, flex_color_scheme (FlexScheme.blue), google_fonts, lucide_icons_flutter
-- **차트**: fl_chart (주간 정답 수 차트)
-- **광고**: google_mobile_ads + AppLovin/Pangle/Unity 미디에이션
-- **기타**: vibration, flutter_animate, firebase_core/analytics/crashlytics, in_app_purchase, in_app_review
+## 프로젝트 요약
+- 앱 번호: 34
+- Phase: 4
+- 상태: ✅ 기능구현
+- 난이도: ★★☆
+- 광고 등급: 상
+- 프로젝트 폴더: `mental_math_trainer`
+- `pubspec` 이름: `mental_math_trainer`
+- Android 패키지: `com.dangundad.mentalmathtrainer`
+- 버전: `1.0.0+1`
+- 핵심 기능: 4가지 연산, 제한 시간, 난이도 진행, 일/주 통계
 
-## 개발 명령어
+## 공통 작업 원칙
+- 모든 텍스트 파일은 UTF-8로 유지하고, PowerShell에서 파일을 쓸 때는 `-Encoding UTF8`을 명시합니다.
+- AI/코드 어시스턴트의 설명, 진행 업데이트, 최종 답변은 기본적으로 한국어로 작성합니다.
+- Android 우선 프로젝트이며, 별도 요청 없이 iOS 전용 코드는 추가하지 않습니다.
+- 릴리스 빌드는 실행하지 않습니다. 일반 작업에서는 `flutter build apk`/`flutter build ios`를 사용하지 않습니다.
+- 코드 변경 후에는 반드시 `flutter analyze`와 `flutter test`를 실행해 결과를 확인합니다.
+- Hive `@HiveType` 모델을 추가하거나 수정했다면 `dart run build_runner build --delete-conflicting-outputs`를 실행합니다.
+- 상태 관리는 GetX, 로컬 저장은 Hive_CE 패턴을 유지하고 기존 네비게이션/영속성 구조를 임의로 바꾸지 않습니다.
+- Windows 표준 경로를 사용하고 WSL 경로(`/mnt/c/...`)는 사용하지 않습니다.
+- `2>nul`, `>nul` 리다이렉션은 사용하지 않으며, `nul` 파일이 생기면 정리합니다.
+
+## 빠른 명령어
 ```bash
+cd C:\Flutter_WorkSpace\mental_math_trainer
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 flutter analyze
+flutter test
 flutter run
 ```
 
-## 아키텍처 (프로젝트 구조)
-```
-lib/
-├── main.dart                          # 앱 진입점
-├── hive_registrar.g.dart              # Hive 어댑터 등록
-├── app/
-│   ├── admob/                         # 광고 (배너/전면/보상형)
-│   ├── bindings/app_binding.dart      # GetX 바인딩
-│   ├── controllers/
-│   │   ├── game_controller.dart       # 게임 로직 (문제 생성, 채점, 통계)
-│   │   ├── history_controller.dart    # 기록 관리
-│   │   ├── home_controller.dart       # 홈 화면
-│   │   ├── premium_controller.dart    # 프리미엄
-│   │   ├── setting_controller.dart    # 설정
-│   │   └── stats_controller.dart      # 통계
-│   ├── data/enums/
-│   │   ├── difficulty.dart            # 난이도 (easy/medium/hard)
-│   │   └── operation.dart             # 연산 (가감승제)
-│   ├── pages/
-│   │   ├── game/
-│   │   │   ├── game_page.dart         # 게임 화면
-│   │   │   └── widgets/
-│   │   │       ├── number_pad.dart    # 숫자 입력 패드
-│   │   │       └── result_dialog.dart # 결과 다이얼로그
-│   │   ├── history/history_page.dart
-│   │   ├── home/home_page.dart
-│   │   ├── premium/
-│   │   ├── settings/settings_page.dart
-│   │   └── stats/stats_page.dart
-│   ├── routes/
-│   ├── services/
-│   │   ├── activity_log_service.dart
-│   │   ├── app_rating_service.dart
-│   │   ├── hive_service.dart          # Hive 서비스 (일별 정답 누적 포함)
-│   │   └── purchase_service.dart
-│   ├── theme/app_flex_theme.dart
-│   ├── translate/translate.dart
-│   ├── utils/app_constants.dart
-│   └── widgets/confetti_overlay.dart
-```
+## 현재 의존성 하이라이트
+- 기반: `get` ^4.7.3, `hive_ce` ^2.19.3, `hive_ce_flutter` ^2.3.4, `path_provider` ^2.1.5, `intl` ^0.20.2, `uuid` ^4.5.3
+- UI/UX: `flutter_screenutil` ^5.9.3, `flex_color_scheme` ^8.4.0, `google_fonts` ^6.3.2, `lucide_icons_flutter` ^3.1.10, `flutter_animate` ^4.5.2, `fl_chart` ^0.70.2, `confetti` ^0.7.0
+- 수익화/운영: `google_mobile_ads` ^6.0.0, `gma_mediation_applovin` ^2.5.1, `gma_mediation_pangle` ^3.5.0, `gma_mediation_unity` ^1.6.2, `in_app_purchase` ^3.2.3, `in_app_review` ^2.0.11, `rate_my_app` ^2.3.2, `firebase_core` ^4.4.0, `firebase_analytics` ^12.1.2, `firebase_crashlytics` ^5.0.7, `device_info_plus` ^12.3.0, `package_info_plus` ^9.0.0, `permission_handler` ^12.0.1, `share_plus` ^12.0.1, `url_launcher` ^6.3.2, `wakelock_plus` ^1.4.0, `vibration` ^3.1.8
 
-## 게임 모드
-### Normal 모드
-- 난이도별 10문제 출제
-- 문제당 제한 시간: Easy 15초, Medium 10초, Hard 7초
-- 800ms 피드백 후 다음 문제 진행
+## 현재 코드 구조
+- `lib/app` 디렉터리: `admob`, `bindings`, `controllers`, `data`, `pages`, `routes`, `services`, `theme`, `translate`, `utils`, `widgets`
+- `bindings`: `app_binding.dart`
+- `routes`: `app_pages.dart`, `app_routes.dart`
+- `controllers`: `game_controller.dart`, `history_controller.dart`, `home_controller.dart`, `premium_controller.dart`, `setting_controller.dart`, `stats_controller.dart`
+- 기능 중심 컨트롤러: `game_controller`
+- `services`: `activity_log_service.dart`, `app_rating_service.dart`, `hive_service.dart`, `purchase_service.dart`
+- 기능 중심 서비스: 없음
+- `pages`: `game`, `history`, `home`, `premium`, `settings`, `stats`
+- `widgets`: `confetti_overlay.dart`
+- `mixins`: 없음
+- `utils`: `app_constants.dart`
+- `translate`: `translate.dart`
+- `theme`: `app_flex_theme.dart`
+- `data/models`: 없음
+- `data/enums`: `difficulty.dart`, `operation.dart`
+- `data/constants`: 없음
+- `data` 루트 파일: 없음
+- `assets`: `data`, `fonts`, `images`
+- `tests`: 1개: `test/widget_test.dart`
 
-### Challenge 모드
-- 60초간 최대한 많은 문제 풀기
-- 문제당 시간 제한 없음 (전체 60초)
-- 최고 기록 저장
-
-## 난이도 설정
-| 난이도 | 가감 범위 | 곱셈 범위 | 나눗셈 몫 범위 |
-|--------|----------|----------|---------------|
-| Easy   | 1~20     | 2~5      | 1~10          |
-| Medium | 1~50     | 2~12     | 1~12          |
-| Hard   | 1~100    | 2~20     | 1~20          |
-
-## 통계 시스템
-- 총 정답/총 문제 (전체 정확도)
-- 오늘 정답/문제 (일일 정확도)
-- 연속 플레이 일수 (streak)
-- 일별 정답 수 누적 (주간 차트용)
-- 챌린지 최고 기록
-
-## 개발 가이드라인
-- 문제 생성: 나눗셈은 정수 결과만 보장 (quotient * divisor 방식)
-- Timer: 100ms 틱으로 부드러운 프로그레스 바
-- 연타 방지: `phase` 상태로 입력 단계 제어
-- 보상형 광고: 보너스 라운드 5문제 추가
+## 문서 유지 규칙
+- 새 페이지나 바인딩을 추가하면 이 문서의 `pages`/`bindings` 요약도 함께 갱신합니다.
+- 의존성 추가/제거, Android 패키지명 변경, 테스트 확장은 이 문서에 바로 반영합니다.
+- 포트폴리오 상태가 바뀌면 메타 레포 `AGENTS.md`, `CLAUDE.md`, 관련 `docs/*.md`와 함께 동기화합니다.
