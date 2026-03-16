@@ -126,7 +126,6 @@ class _GamePageState extends State<_GamePageContent> {
                     onDigit: widget.controller.appendDigit,
                     onBackspace: widget.controller.backspace,
                     onSubmit: widget.controller.submitAnswer,
-                    allowNegative: true,
                   ),
                   SizedBox(height: 12.h),
                   ConfirmButton(onTap: widget.controller.submitAnswer),
@@ -341,7 +340,9 @@ class _FeedbackAreaState extends State<_FeedbackArea>
                 ),
                 SizedBox(width: 6.w),
                 Text(
-                  correct ? 'correct'.tr : 'wrong'.tr,
+                  correct
+                      ? 'correct'.tr
+                      : '${'wrong'.tr}  ${widget.controller.currentQuestion.value?.answer ?? ''}',
                   style: TextStyle(
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w700,

@@ -126,14 +126,16 @@ class GameController extends GetxController {
 
   // ─── Round flow ───────────────────────────────────────
   void startRound() {
+    // Stop any in-flight challenge/timer to prevent stale callbacks
     _questionTimer?.cancel();
     _challengeCountdown?.cancel();
     _challengeCountdown = null;
-    _challengeEnded = true; // prevent any in-flight challenge callback
+    _challengeEnded = true;
     gameMode.value = GameMode.normal;
     roundResults.clear();
     questionIndex.value = 0;
     _roundCorrect = 0;
+    // Reset after clearing state so new round callbacks proceed normally
     _challengeEnded = false;
     _nextQuestion();
   }
@@ -160,8 +162,10 @@ class GameController extends GetxController {
     _challengeCountdown = Timer.periodic(const Duration(seconds: 1), (t) {
       final left = challengeTimeLeft.value - 1;
       challengeTimeLeft.value = left;
+      timeProgress.value = left / challengeDurationSeconds;
       if (left <= 0) {
         t.cancel();
+        timeProgress.value = 0.0;
         _endChallenge();
       }
     });
@@ -194,9 +198,9 @@ class GameController extends GetxController {
 
   void _startTimer() {
     _questionTimer?.cancel();
-    // In challenge mode there is no per-question time limit
+    // In challenge mode, sync timeProgress with challengeTimeLeft
     if (gameMode.value == GameMode.challenge) {
-      timeProgress.value = 1.0;
+      timeProgress.value = challengeTimeLeft.value / challengeDurationSeconds;
       return;
     }
     const tickMs = 100;
@@ -221,17 +225,21 @@ class GameController extends GetxController {
 
   void appendDigit(String digit) {
     if (phase.value != RoundPhase.question) return;
-    if (userInput.value.length >= 5) return;
     if (SettingController.to.hapticEnabled.value && _hasVibrator) Vibration.vibrate(duration: 30);
-    // Handle negative sign
+    // Handle negative sign toggle
     if (digit == '-') {
-      if (userInput.value.isEmpty) {
-        userInput.value = '-';
+      if (userInput.value.startsWith('-')) {
+        userInput.value = userInput.value.substring(1);
+      } else {
+        userInput.value = '-${userInput.value}';
       }
       return;
     }
-    if (userInput.value == '0') {
-      userInput.value = digit;
+    if (userInput.value.length >= 6) return;
+    if (userInput.value == '0' || userInput.value == '-0') {
+      // Replace leading zero with the digit
+      final prefix = userInput.value.startsWith('-') ? '-' : '';
+      userInput.value = '$prefix$digit';
     } else {
       userInput.value += digit;
     }
@@ -344,13 +352,14 @@ class GameController extends GetxController {
         return Question(operand1: a, operand2: b, operation: op);
 
       case Operation.subtraction:
-        final a = _random.nextInt(d.addSubMax) + 1;
-        final b = _random.nextInt(a) + 1; // b ≤ a → result ≥ 0
+        // Ensure a >= 2 so b has a valid range (1..a-1), avoiding trivial 1-1=0
+        final a = _random.nextInt(d.addSubMax - 1) + 2; // range: 2..addSubMax
+        final b = _random.nextInt(a - 1) + 1; // range: 1..(a-1), result > 0
         return Question(operand1: a, operand2: b, operation: op);
 
       case Operation.multiplication:
-        final a = _random.nextInt(d.mulMax) + 2;
-        final b = _random.nextInt(d.mulMax) + 2;
+        final a = _random.nextInt(d.mulMax - 1) + 2;
+        final b = _random.nextInt(d.mulMax - 1) + 2;
         return Question(operand1: a, operand2: b, operation: op);
 
       case Operation.division:
