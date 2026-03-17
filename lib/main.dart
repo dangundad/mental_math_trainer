@@ -30,21 +30,6 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  try {
-    final canRequestAds = await AdHelper.initializeConsentAndAds();
-    if (canRequestAds) {
-      final status = await AdHelper.currentInitializationStatus();
-      status?.adapterStatuses.forEach((key, value) {
-        debugPrint('Adapter status for $key: ${value.description}');
-      });
-      debugPrint('AdMob initialized successfully');
-    } else {
-      debugPrint('AdMob initialization skipped until consent is available');
-    }
-  } catch (e) {
-    debugPrint('AdMob initialization failed: $e');
-  }
-
   await AppBinding.initializeServices();
 
   await SystemChrome.setEnabledSystemUIMode(
@@ -55,8 +40,27 @@ Future<void> main() async {
   runApp(const MentalMathTrainerApp());
 }
 
-class MentalMathTrainerApp extends StatelessWidget {
+class MentalMathTrainerApp extends StatefulWidget {
   const MentalMathTrainerApp({super.key});
+
+  @override
+  State<MentalMathTrainerApp> createState() => _MentalMathTrainerAppState();
+}
+
+class _MentalMathTrainerAppState extends State<MentalMathTrainerApp> {
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_initializeAds());
+  }
+
+  Future<void> _initializeAds() async {
+    try {
+      await AdHelper.initializeConsentAndAds();
+    } catch (e) {
+      debugPrint('AdMob initialization failed: $e');
+    }
+  }
 
   GetMaterialApp _buildFallbackApp() {
     return GetMaterialApp(
