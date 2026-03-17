@@ -55,7 +55,7 @@ class GameController extends GetxController {
   static const _todayDateKey = 'mm_today_date';
   static const _streakKey = 'mm_streak';
   static const _lastPlayedKey = 'mm_last_played';
-  static const _bestRoundCorrectKey = 'mm_best_round_correct';
+  String get _bestRoundCorrectKey => 'mm_best_round_correct_${difficulty.value.name}';
   static const _bestChallengeScoreKey = 'mm_best_challenge_score';
 
   // Settings (observable)
@@ -383,8 +383,18 @@ class GameController extends GetxController {
     bestChallengeScore.value =
         HiveService.to.getAppData<int>(_bestChallengeScoreKey) ?? 0;
 
+    // Validate streak on app start
     final today = _todayKey();
     final storedDate = HiveService.to.getAppData<String>(_todayDateKey) ?? '';
+    if (storedDate != today) {
+      final yesterday = _yesterdayKey();
+      final lastPlayed = HiveService.to.getAppData<String>(_lastPlayedKey) ?? '';
+      if (lastPlayed != today && lastPlayed != yesterday) {
+        streak.value = 0;
+        HiveService.to.setAppData(_streakKey, 0);
+      }
+    }
+
     if (storedDate == today) {
       todayCorrect.value =
           HiveService.to.getAppData<int>(_todayCorrectKey) ?? 0;
