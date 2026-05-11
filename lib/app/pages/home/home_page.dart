@@ -29,35 +29,24 @@ class HomePage extends GetView<GameController> {
         elevation: 0,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(3),
-          child: Container(
-            height: 3,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [cs.primary, cs.tertiary],
-              ),
-            ),
+          child: ColoredBox(
+            color: cs.primary,
+            child: const SizedBox(height: 3),
           ),
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              cs.primary.withValues(alpha: 0.08),
-              cs.surface,
-              cs.secondaryContainer.withValues(alpha: 0.15),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+      body: ColoredBox(
+        color: cs.surface,
         child: SafeArea(
           top: false,
           child: Column(
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 16.h,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -123,24 +112,21 @@ class _HeroSection extends StatelessWidget {
           tween: Tween(begin: 0.7, end: 1.0),
           duration: const Duration(milliseconds: 700),
           curve: Curves.easeOutBack,
-          builder: (context, value, child) => Transform.scale(
-            scale: value,
-            child: child,
-          ),
+          builder: (context, value, child) =>
+              Transform.scale(scale: value, child: child),
           child: Container(
             width: 110.r,
             height: 110.r,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  cs.primaryContainer,
-                  cs.primaryContainer.withValues(alpha: 0.0),
-                ],
-              ),
+              color: cs.primaryContainer,
             ),
             child: Center(
-              child: Icon(LucideIcons.calculator, size: 60.r, color: cs.primary),
+              child: Icon(
+                LucideIcons.calculator,
+                size: 60.r,
+                color: cs.primary,
+              ),
             ),
           ),
         ),
@@ -209,15 +195,9 @@ class _StatsRow extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            cs.primaryContainer,
-            cs.secondaryContainer.withValues(alpha: 0.7),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: cs.primaryContainer,
         borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: cs.primary.withValues(alpha: 0.18)),
         boxShadow: [
           BoxShadow(
             color: cs.primary.withValues(alpha: 0.12),
@@ -226,35 +206,33 @@ class _StatsRow extends StatelessWidget {
           ),
         ],
       ),
-      child: Obx(
-        () {
-          final todayCorrect = controller.todayCorrect.value;
-          final todayTotal = controller.todayQuestions.value;
-          final accuracy = (controller.todayAccuracy * 100).round();
+      child: Obx(() {
+        final todayCorrect = controller.todayCorrect.value;
+        final todayTotal = controller.todayQuestions.value;
+        final accuracy = (controller.todayAccuracy * 100).round();
 
-          return Row(
-            children: [
-              _StatItem(
-                label: 'stat_today'.tr,
-                value: '$todayCorrect/$todayTotal',
-                color: cs.onPrimaryContainer,
-              ),
-              _VertDivider(),
-              _StatItem(
-                label: 'stat_accuracy'.tr,
-                value: '$accuracy%',
-                color: cs.onPrimaryContainer,
-              ),
-              _VertDivider(),
-              _StatItem(
-                label: 'stat_streak'.tr,
-                value: '${controller.streak.value}',
-                color: cs.onPrimaryContainer,
-              ),
-            ],
-          );
-        },
-      ),
+        return Row(
+          children: [
+            _StatItem(
+              label: 'stat_today'.tr,
+              value: '$todayCorrect/$todayTotal',
+              color: cs.onPrimaryContainer,
+            ),
+            _VertDivider(),
+            _StatItem(
+              label: 'stat_accuracy'.tr,
+              value: '$accuracy%',
+              color: cs.onPrimaryContainer,
+            ),
+            _VertDivider(),
+            _StatItem(
+              label: 'stat_streak'.tr,
+              value: '${controller.streak.value}',
+              color: cs.onPrimaryContainer,
+            ),
+          ],
+        );
+      }),
     );
   }
 }
@@ -287,7 +265,10 @@ class _StatItem extends StatelessWidget {
           SizedBox(height: 4.h),
           Text(
             label,
-            style: TextStyle(fontSize: 10.sp, color: color.withValues(alpha: 0.75)),
+            style: TextStyle(
+              fontSize: 10.sp,
+              color: color.withValues(alpha: 0.75),
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -326,7 +307,9 @@ class _DifficultySelector extends StatelessWidget {
           final isSelected = controller.difficulty.value == d;
           return Expanded(
             child: Padding(
-              padding: EdgeInsets.only(right: d == Difficulty.values.last ? 0 : 8.w),
+              padding: EdgeInsets.only(
+                right: d == Difficulty.values.last ? 0 : 8.w,
+              ),
               child: _DifficultyCard(
                 difficulty: d,
                 isSelected: isSelected,
@@ -371,7 +354,9 @@ class _DifficultyCard extends StatelessWidget {
         duration: const Duration(milliseconds: 170),
         padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 8.w),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.16) : cs.surfaceContainerLow,
+          color: isSelected
+              ? color.withValues(alpha: 0.16)
+              : cs.surfaceContainerLow,
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             color: isSelected ? color : Colors.transparent,
@@ -613,7 +598,8 @@ class _StartButton extends StatefulWidget {
   State<_StartButton> createState() => _StartButtonState();
 }
 
-class _StartButtonState extends State<_StartButton> with SingleTickerProviderStateMixin {
+class _StartButtonState extends State<_StartButton>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _pulseCtrl;
   late final Animation<double> _pulseAnim;
 
@@ -625,9 +611,10 @@ class _StartButtonState extends State<_StartButton> with SingleTickerProviderSta
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
 
-    _pulseAnim = Tween<double>(begin: 1.0, end: 1.04).animate(
-      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
-    );
+    _pulseAnim = Tween<double>(
+      begin: 1.0,
+      end: 1.04,
+    ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -641,18 +628,12 @@ class _StartButtonState extends State<_StartButton> with SingleTickerProviderSta
     final cs = Get.theme.colorScheme;
     return AnimatedBuilder(
       animation: _pulseAnim,
-      builder: (context, child) => Transform.scale(
-        scale: _pulseAnim.value,
-        child: child,
-      ),
+      builder: (context, child) =>
+          Transform.scale(scale: _pulseAnim.value, child: child),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [cs.primary, cs.tertiary],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
+          color: cs.primary,
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
@@ -675,7 +656,11 @@ class _StartButtonState extends State<_StartButton> with SingleTickerProviderSta
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.play_arrow_rounded, size: 28.r, color: cs.onPrimary),
+                  Icon(
+                    Icons.play_arrow_rounded,
+                    size: 28.r,
+                    color: cs.onPrimary,
+                  ),
                   SizedBox(width: 10.w),
                   Text(
                     'start_round'.tr,

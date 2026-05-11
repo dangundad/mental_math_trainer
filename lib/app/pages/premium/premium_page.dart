@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -16,20 +16,10 @@ class PremiumPage extends GetView<PremiumController> {
     final purchaseService = PurchaseService.to;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: cs.surface,
       body: SafeArea(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                cs.surface,
-                cs.surfaceContainerLowest.withValues(alpha: 0.94),
-                cs.surfaceContainerLow.withValues(alpha: 0.9),
-              ],
-            ),
-          ),
+        child: ColoredBox(
+          color: cs.surface,
           child: Obx(
             () => purchaseService.isPremium.value
                 ? _buildOwnedView(context, cs)
@@ -89,12 +79,7 @@ class PremiumPage extends GetView<PremiumController> {
                   height: 52.r,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16.r),
-                    gradient: LinearGradient(
-                      colors: [
-                        cs.primary,
-                        cs.primary.withValues(alpha: 0.64),
-                      ],
-                    ),
+                    color: cs.primary,
                   ),
                   child: Icon(
                     LucideIcons.sparkles,
@@ -139,8 +124,9 @@ class PremiumPage extends GetView<PremiumController> {
             () => SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed:
-                    purchaseService.isLoading.value ? null : controller.purchase,
+                onPressed: purchaseService.isLoading.value
+                    ? null
+                    : controller.purchase,
                 icon: Icon(LucideIcons.sparkles, size: 16.r),
                 label: Text(
                   purchaseService.isLoading.value
@@ -154,7 +140,9 @@ class PremiumPage extends GetView<PremiumController> {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: purchaseService.isLoading.value ? null : controller.restore,
+              onPressed: purchaseService.isLoading.value
+                  ? null
+                  : controller.restore,
               child: Text('premium_restore'.tr),
             ),
           ),
@@ -196,11 +184,7 @@ class PremiumPage extends GetView<PremiumController> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                LucideIcons.crown,
-                size: 60.r,
-                color: cs.primary,
-              ),
+              Icon(LucideIcons.crown, size: 60.r, color: cs.primary),
               SizedBox(height: 14.h),
               Text(
                 'premium_owned'.tr,
@@ -213,10 +197,7 @@ class PremiumPage extends GetView<PremiumController> {
               SizedBox(height: 6.h),
               Text(
                 'premium_ready'.tr,
-                style: TextStyle(
-                  color: cs.onSurfaceVariant,
-                  height: 1.4,
-                ),
+                style: TextStyle(color: cs.onSurfaceVariant, height: 1.4),
               ),
             ],
           ),
@@ -263,11 +244,7 @@ class _BenefitsCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.check_circle,
-                    size: 16.r,
-                    color: cs.primary,
-                  ),
+                  Icon(Icons.check_circle, size: 16.r, color: cs.primary),
                   SizedBox(width: 8.w),
                   Expanded(
                     child: Text(
@@ -339,7 +316,7 @@ class _PriceCard extends StatelessWidget {
                     fontSize: 24.sp,
                     fontWeight: FontWeight.w800,
                     color: cs.onSurface,
-                    letterSpacing: -0.5,
+                    letterSpacing: 0,
                   ),
                 ),
                 Text(
@@ -403,4 +380,3 @@ class _DevToggleButton extends StatelessWidget {
     });
   }
 }
-

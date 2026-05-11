@@ -55,7 +55,8 @@ class GameController extends GetxController {
   static const _todayDateKey = 'mm_today_date';
   static const _streakKey = 'mm_streak';
   static const _lastPlayedKey = 'mm_last_played';
-  String get _bestRoundCorrectKey => 'mm_best_round_correct_${difficulty.value.name}';
+  String get _bestRoundCorrectKey =>
+      'mm_best_round_correct_${difficulty.value.name}';
   static const _bestChallengeScoreKey = 'mm_best_challenge_score';
 
   // Settings (observable)
@@ -88,7 +89,9 @@ class GameController extends GetxController {
   final bestChallengeScore = 0.obs;
 
   // Confetti
-  late final confettiController = ConfettiController(duration: const Duration(seconds: 2));
+  late final confettiController = ConfettiController(
+    duration: const Duration(seconds: 2),
+  );
 
   bool _hasVibrator = false;
 
@@ -166,12 +169,12 @@ class GameController extends GetxController {
       if (left <= 0) {
         t.cancel();
         timeProgress.value = 0.0;
-        _endChallenge();
+        unawaited(_endChallenge());
       }
     });
   }
 
-  void _endChallenge() {
+  Future<void> _endChallenge() async {
     if (_challengeEnded) return;
     _challengeEnded = true;
     _questionTimer?.cancel();
@@ -179,13 +182,15 @@ class GameController extends GetxController {
     final score = challengeCorrect.value;
     if (score > prevBest) {
       bestChallengeScore.value = score;
-      HiveService.to.setAppData(_bestChallengeScoreKey, score);
+      await HiveService.to.setAppData(_bestChallengeScoreKey, score);
       isNewChallengeRecord.value = true;
       confettiController.play();
     }
-    _updateStats(score, challengeTotal.value);
+    await _updateStats(score, challengeTotal.value);
     phase.value = RoundPhase.result;
-    InterstitialAdManager.to.showAdIfAvailable();
+    if (Get.isRegistered<InterstitialAdManager>()) {
+      InterstitialAdManager.to.showAdIfAvailable();
+    }
   }
 
   void _nextQuestion() {
@@ -224,8 +229,12 @@ class GameController extends GetxController {
   }
 
   void appendDigit(String digit) {
-    if (phase.value != RoundPhase.question) return;
-    if (SettingController.to.hapticEnabled.value && _hasVibrator) Vibration.vibrate(duration: 30);
+    if (phase.value != RoundPhase.question) {
+      return;
+    }
+    if (SettingController.to.hapticEnabled.value && _hasVibrator) {
+      Vibration.vibrate(duration: 30);
+    }
     // Handle negative sign toggle
     if (digit == '-') {
       if (userInput.value.startsWith('-')) {
@@ -248,15 +257,19 @@ class GameController extends GetxController {
   void backspace() {
     if (phase.value != RoundPhase.question) return;
     if (userInput.value.isNotEmpty) {
-      userInput.value =
-          userInput.value.substring(0, userInput.value.length - 1);
+      userInput.value = userInput.value.substring(
+        0,
+        userInput.value.length - 1,
+      );
     }
   }
 
   void submitAnswer() {
     if (phase.value != RoundPhase.question) return;
     // In challenge mode, block submission after time is up
-    if (gameMode.value == GameMode.challenge && challengeTimeLeft.value <= 0) return;
+    if (gameMode.value == GameMode.challenge && challengeTimeLeft.value <= 0) {
+      return;
+    }
     final parsed = int.tryParse(userInput.value);
     if (parsed == null) return;
     _questionTimer?.cancel();
@@ -272,9 +285,13 @@ class GameController extends GetxController {
       if (gameMode.value == GameMode.challenge) {
         challengeCorrect.value++;
       }
-      if (SettingController.to.hapticEnabled.value && _hasVibrator) Vibration.vibrate(duration: 50);
+      if (SettingController.to.hapticEnabled.value && _hasVibrator) {
+        Vibration.vibrate(duration: 50);
+      }
     } else {
-      if (SettingController.to.hapticEnabled.value && _hasVibrator) Vibration.vibrate(duration: 200);
+      if (SettingController.to.hapticEnabled.value && _hasVibrator) {
+        Vibration.vibrate(duration: 200);
+      }
     }
 
     if (gameMode.value == GameMode.challenge) {
@@ -295,13 +312,13 @@ class GameController extends GetxController {
     // Capture the current questionIndex to detect stale delayed callbacks
     // (e.g. if the user quickly navigates away and starts a new round).
     final capturedIndex = questionIndex.value;
-    Future.delayed(const Duration(milliseconds: 800), () {
+    Future.delayed(const Duration(milliseconds: 800), () async {
       // Discard if phase changed (e.g. round restarted) or index moved on.
       if (phase.value != RoundPhase.feedback) return;
       if (questionIndex.value != capturedIndex) return;
       final idx = capturedIndex + 1;
       if (idx >= difficulty.value.questionsPerRound) {
-        _endRound();
+        await _endRound();
       } else {
         questionIndex.value = idx;
         _nextQuestion();
@@ -309,21 +326,25 @@ class GameController extends GetxController {
     });
   }
 
-  void _endRound() {
-    if (SettingController.to.hapticEnabled.value && _hasVibrator) Vibration.vibrate(duration: 100);
+  Future<void> _endRound() async {
+    if (SettingController.to.hapticEnabled.value && _hasVibrator) {
+      Vibration.vibrate(duration: 100);
+    }
     final total = difficulty.value.questionsPerRound;
     final isPerfect = _roundCorrect == total;
     final prevBest = HiveService.to.getAppData<int>(_bestRoundCorrectKey) ?? 0;
     final isNewBest = _roundCorrect > prevBest;
     if (isNewBest) {
-      HiveService.to.setAppData(_bestRoundCorrectKey, _roundCorrect);
+      await HiveService.to.setAppData(_bestRoundCorrectKey, _roundCorrect);
     }
     if (isPerfect || isNewBest) {
       confettiController.play();
     }
-    _updateStats(_roundCorrect, total);
+    await _updateStats(_roundCorrect, total);
     phase.value = RoundPhase.result;
-    InterstitialAdManager.to.showAdIfAvailable();
+    if (Get.isRegistered<InterstitialAdManager>()) {
+      InterstitialAdManager.to.showAdIfAvailable();
+    }
   }
 
   void requestBonusRound() {
@@ -388,7 +409,8 @@ class GameController extends GetxController {
     final storedDate = HiveService.to.getAppData<String>(_todayDateKey) ?? '';
     if (storedDate != today) {
       final yesterday = _yesterdayKey();
-      final lastPlayed = HiveService.to.getAppData<String>(_lastPlayedKey) ?? '';
+      final lastPlayed =
+          HiveService.to.getAppData<String>(_lastPlayedKey) ?? '';
       if (lastPlayed != today && lastPlayed != yesterday) {
         streak.value = 0;
         HiveService.to.setAppData(_streakKey, 0);
@@ -406,7 +428,7 @@ class GameController extends GetxController {
     }
   }
 
-  void _updateStats(int correct, int total) {
+  Future<void> _updateStats(int correct, int total) async {
     totalCorrect.value += correct;
     totalQuestions.value += total;
 
@@ -425,26 +447,29 @@ class GameController extends GetxController {
       } else if (lastPlayed != today) {
         streak.value = 1;
       }
-      HiveService.to.setAppData(_streakKey, streak.value);
-      HiveService.to.setAppData(_todayDateKey, today);
-      HiveService.to.setAppData(_lastPlayedKey, today);
+      await Future.wait([
+        HiveService.to.setAppData(_streakKey, streak.value),
+        HiveService.to.setAppData(_todayDateKey, today),
+        HiveService.to.setAppData(_lastPlayedKey, today),
+      ]);
     } else {
       todayCorrect.value += correct;
       todayQuestions.value += total;
     }
 
-    HiveService.to.setAppData(_totalCorrectKey, totalCorrect.value);
-    HiveService.to.setAppData(_totalQuestionsKey, totalQuestions.value);
-    HiveService.to.setAppData(_todayCorrectKey, todayCorrect.value);
-    HiveService.to.setAppData(_todayQuestionsKey, todayQuestions.value);
-
-    // 일별 정답 수 누적 저장 (주간 차트용)
-    HiveService.to.addDailyCorrect(today, correct);
+    await Future.wait([
+      HiveService.to.setAppData(_totalCorrectKey, totalCorrect.value),
+      HiveService.to.setAppData(_totalQuestionsKey, totalQuestions.value),
+      HiveService.to.setAppData(_todayCorrectKey, todayCorrect.value),
+      HiveService.to.setAppData(_todayQuestionsKey, todayQuestions.value),
+      HiveService.to.addDailyCorrect(today, correct),
+    ]);
   }
 
   String _todayKey() => DateFormat('yyyy-MM-dd').format(DateTime.now());
-  String _yesterdayKey() => DateFormat('yyyy-MM-dd')
-      .format(DateTime.now().subtract(const Duration(days: 1)));
+  String _yesterdayKey() => DateFormat(
+    'yyyy-MM-dd',
+  ).format(DateTime.now().subtract(const Duration(days: 1)));
 
   // Computed getters
   int get roundCorrect => _roundCorrect;

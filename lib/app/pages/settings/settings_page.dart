@@ -39,13 +39,9 @@ class SettingsPage extends GetView<SettingController> {
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(3),
-          child: Container(
-            height: 3,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Get.theme.colorScheme.primary, Get.theme.colorScheme.tertiary],
-              ),
-            ),
+          child: ColoredBox(
+            color: Get.theme.colorScheme.primary,
+            child: const SizedBox(height: 3),
           ),
         ),
       ),
@@ -76,7 +72,10 @@ class SettingsPage extends GetView<SettingController> {
                   _buildSwitchTile(
                     icon: Icons.privacy_tip,
                     title: _loc('ads_consent', 'Advertising consent'),
-                    subtitle: _loc('ads_consent_desc', 'Use ad personalization preference'),
+                    subtitle: _loc(
+                      'ads_consent_desc',
+                      'Use ad personalization preference',
+                    ),
                     value: controller.adsConsent.value,
                     onChanged: controller.setAdsConsent,
                   ),
@@ -119,7 +118,12 @@ class SettingsPage extends GetView<SettingController> {
                   ListTile(
                     leading: const Icon(Icons.auto_awesome),
                     title: Text(_loc('premium_title', 'Premium')),
-                    subtitle: Text(_loc('premium_subtitle', 'Unlock premium features and remove ads')),
+                    subtitle: Text(
+                      _loc(
+                        'premium_subtitle',
+                        'Unlock premium features and remove ads',
+                      ),
+                    ),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => Get.toNamed(Routes.PREMIUM),
                   ),
@@ -134,7 +138,12 @@ class SettingsPage extends GetView<SettingController> {
                   ListTile(
                     leading: const Icon(Icons.delete_outline),
                     title: Text(_loc('clear_data', 'Clear local data')),
-                    subtitle: Text(_loc('clear_data_desc', 'Reset sound, haptic, consent, language and history logs.')),
+                    subtitle: Text(
+                      _loc(
+                        'clear_data_desc',
+                        'Reset sound, haptic, consent, language and history logs.',
+                      ),
+                    ),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => _clearData(context),
                   ),
@@ -247,7 +256,9 @@ class SettingsPage extends GetView<SettingController> {
     final completer = Completer<bool>();
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28.r),
+        ),
         clipBehavior: Clip.antiAlias,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -255,14 +266,7 @@ class SettingsPage extends GetView<SettingController> {
             Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 20.h),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    colorScheme.errorContainer,
-                    colorScheme.error.withValues(alpha: 0.3),
-                  ],
-                ),
-              ),
+              decoration: BoxDecoration(color: colorScheme.errorContainer),
               child: Center(
                 child: Container(
                   width: 52.r,
@@ -271,7 +275,11 @@ class SettingsPage extends GetView<SettingController> {
                     shape: BoxShape.circle,
                     color: colorScheme.error.withValues(alpha: 0.15),
                   ),
-                  child: Icon(Icons.delete_forever_rounded, size: 26.r, color: colorScheme.error),
+                  child: Icon(
+                    Icons.delete_forever_rounded,
+                    size: 26.r,
+                    color: colorScheme.error,
+                  ),
                 ),
               ),
             ),
@@ -281,12 +289,21 @@ class SettingsPage extends GetView<SettingController> {
                 children: [
                   Text(
                     _loc('clear_data', 'Clear local data'),
-                    style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    _loc('clear_data_confirm', 'This removes all local settings and logs. Continue?'),
-                    style: TextStyle(fontSize: 14.sp, color: colorScheme.onSurfaceVariant),
+                    _loc(
+                      'clear_data_confirm',
+                      'This removes all local settings and logs. Continue?',
+                    ),
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -309,9 +326,7 @@ class SettingsPage extends GetView<SettingController> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [colorScheme.error, colorScheme.errorContainer],
-                        ),
+                        color: colorScheme.error,
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Material(
@@ -370,5 +385,3 @@ String _loc(String key, String fallback) {
   final translated = key.tr;
   return translated == key ? fallback : translated;
 }
-
-

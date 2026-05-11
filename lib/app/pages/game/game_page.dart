@@ -48,7 +48,6 @@ class _GamePageState extends State<_GamePageContent> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     final cs = Get.theme.colorScheme;
@@ -70,13 +69,9 @@ class _GamePageState extends State<_GamePageContent> {
         backgroundColor: Get.theme.colorScheme.surface,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(3),
-          child: Container(
-            height: 3,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Get.theme.colorScheme.primary, Get.theme.colorScheme.tertiary],
-              ),
-            ),
+          child: ColoredBox(
+            color: Get.theme.colorScheme.primary,
+            child: const SizedBox(height: 3),
           ),
         ),
         actions: [
@@ -88,8 +83,8 @@ class _GamePageState extends State<_GamePageContent> {
             final color = left <= 10
                 ? const Color(0xFFC62828)
                 : left <= 20
-                    ? Colors.orange
-                    : null;
+                ? Colors.orange
+                : null;
             return Padding(
               padding: EdgeInsets.only(right: 16.w),
               child: Center(
@@ -163,9 +158,10 @@ class _TimerBarState extends State<_TimerBar>
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    _pulseAnim = Tween<double>(begin: 0.7, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
-    );
+    _pulseAnim = Tween<double>(
+      begin: 0.7,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -191,8 +187,8 @@ class _TimerBarState extends State<_TimerBar>
       final color = progress > 0.5
           ? cs.primary
           : progress > 0.25
-              ? Colors.orange
-              : cs.error;
+          ? Colors.orange
+          : cs.error;
 
       final bar = ClipRRect(
         borderRadius: BorderRadius.circular(4.r),
@@ -208,10 +204,8 @@ class _TimerBarState extends State<_TimerBar>
 
       return AnimatedBuilder(
         animation: _pulseAnim,
-        builder: (context, child) => Opacity(
-          opacity: _pulseAnim.value,
-          child: child,
-        ),
+        builder: (context, child) =>
+            Opacity(opacity: _pulseAnim.value, child: child),
         child: bar,
       );
     });
@@ -330,9 +324,7 @@ class _FeedbackAreaState extends State<_FeedbackArea>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  correct
-                      ? Icons.check_circle_rounded
-                      : Icons.cancel_rounded,
+                  correct ? Icons.check_circle_rounded : Icons.cancel_rounded,
                   color: correct
                       ? const Color(0xFF2E7D32)
                       : const Color(0xFFC62828),

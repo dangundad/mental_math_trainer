@@ -30,136 +30,136 @@ class _NormalResultDialog extends StatelessWidget {
     final isPerfect = correct == total;
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 20.h),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [cs.primaryContainer, cs.primary.withValues(alpha: 0.3)],
-              ),
-            ),
-            child: Center(
-              child: Container(
-                width: 52.r,
-                height: 52.r,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: cs.primary.withValues(alpha: 0.15),
-                ),
-                child: Icon(
-                  isPerfect ? Icons.emoji_events_rounded : Icons.check_circle_rounded,
-                  size: 26.r,
-                  color: cs.primary,
-                ),
-              ),
-            ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28.r),
           ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 8.h),
-            child: Column(
-              children: [
-                Text(
-                  isPerfect ? 'result_perfect'.tr : 'result_done'.tr,
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w800,
-                    color: cs.primary,
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 20.h),
+                decoration: BoxDecoration(color: cs.primaryContainer),
+                child: Center(
+                  child: Container(
+                    width: 52.r,
+                    height: 52.r,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: cs.primary.withValues(alpha: 0.15),
+                    ),
+                    child: Icon(
+                      isPerfect
+                          ? Icons.emoji_events_rounded
+                          : Icons.check_circle_rounded,
+                      size: 26.r,
+                      color: cs.primary,
+                    ),
                   ),
                 ),
-                SizedBox(height: 16.h),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(16.r),
-                  decoration: BoxDecoration(
-                    color: cs.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Column(
-                    children: [
-                      _StatRow(
-                        label: 'result_score'.tr,
-                        value: '$correct / $total',
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 8.h),
+                child: Column(
+                  children: [
+                    Text(
+                      isPerfect ? 'result_perfect'.tr : 'result_done'.tr,
+                      style: TextStyle(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.w800,
                         color: cs.primary,
-                        bold: true,
-                        animateValue: true,
-                        valueKey: correct,
                       ),
-                      Divider(height: 16.h),
-                      _StatRow(
-                        label: 'result_accuracy'.tr,
-                        value: '$accuracy%',
-                        color: accuracy >= 80
-                            ? const Color(0xFF2E7D32)
-                            : accuracy >= 60
+                    ),
+                    SizedBox(height: 16.h),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(16.r),
+                      decoration: BoxDecoration(
+                        color: cs.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Column(
+                        children: [
+                          _StatRow(
+                            label: 'result_score'.tr,
+                            value: '$correct / $total',
+                            color: cs.primary,
+                            bold: true,
+                            animateValue: true,
+                            valueKey: correct,
+                          ),
+                          Divider(height: 16.h),
+                          _StatRow(
+                            label: 'result_accuracy'.tr,
+                            value: '$accuracy%',
+                            color: accuracy >= 80
+                                ? const Color(0xFF2E7D32)
+                                : accuracy >= 60
                                 ? const Color(0xFFE65100)
                                 : cs.error,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 12.h),
-                Obx(() => _RoundDots(results: controller.roundResults)),
-                SizedBox(height: 12.h),
-                OutlinedButton.icon(
-                  onPressed: () => controller.requestBonusRound(),
-                  icon: const Icon(Icons.play_circle_outline_rounded),
-                  label: Text('result_bonus'.tr),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 16.h),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: () => Get.back(),
-                    child: Text('home'.tr),
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [cs.primary, cs.tertiary]),
-                      borderRadius: BorderRadius.circular(12.r),
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12.r),
-                        onTap: () {
-                          Get.back();
-                          controller.startRound();
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12.h),
-                          child: Center(
-                            child: Text(
-                              'play_again'.tr,
-                              style: TextStyle(
-                                color: cs.onPrimary,
-                                fontWeight: FontWeight.w600,
+                    SizedBox(height: 12.h),
+                    Obx(() => _RoundDots(results: controller.roundResults)),
+                    SizedBox(height: 12.h),
+                    OutlinedButton.icon(
+                      onPressed: () => controller.requestBonusRound(),
+                      icon: const Icon(Icons.play_circle_outline_rounded),
+                      label: Text('result_bonus'.tr),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 16.h),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Get.back(),
+                        child: Text('home'.tr),
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: cs.primary,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12.r),
+                            onTap: () {
+                              Get.back();
+                              controller.startRound();
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              child: Center(
+                                child: Text(
+                                  'play_again'.tr,
+                                  style: TextStyle(
+                                    color: cs.onPrimary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    )
+        )
         .animate()
         .fadeIn(duration: 300.ms)
         .slideY(begin: 0.2, end: 0, duration: 300.ms, curve: Curves.easeOut);
@@ -180,145 +180,143 @@ class _ChallengeResultDialog extends StatelessWidget {
     final best = controller.bestChallengeScore.value;
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 20.h),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [cs.primaryContainer, cs.primary.withValues(alpha: 0.3)],
-              ),
-            ),
-            child: Center(
-              child: Container(
-                width: 52.r,
-                height: 52.r,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: cs.primary.withValues(alpha: 0.15),
-                ),
-                child: Icon(
-                  isNew ? Icons.emoji_events_rounded : Icons.bolt_rounded,
-                  size: 26.r,
-                  color: cs.primary,
-                ),
-              ),
-            ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28.r),
           ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 8.h),
-            child: Column(
-              children: [
-                if (isNew) ...[
-                  Text(
-                    'new_record'.tr,
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFFE65100),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 20.h),
+                decoration: BoxDecoration(color: cs.primaryContainer),
+                child: Center(
+                  child: Container(
+                    width: 52.r,
+                    height: 52.r,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: cs.primary.withValues(alpha: 0.15),
+                    ),
+                    child: Icon(
+                      isNew ? Icons.emoji_events_rounded : Icons.bolt_rounded,
+                      size: 26.r,
+                      color: cs.primary,
                     ),
                   ),
-                  SizedBox(height: 4.h),
-                ],
-                Text(
-                  'challenge_result_title'.tr,
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w800,
-                    color: cs.primary,
-                  ),
                 ),
-                SizedBox(height: 16.h),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(16.r),
-                  decoration: BoxDecoration(
-                    color: cs.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Column(
-                    children: [
-                      _StatRow(
-                        label: 'challenge_score'.tr,
-                        value: '$score',
-                        color: cs.primary,
-                        bold: true,
-                        animateValue: true,
-                        valueKey: score,
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 8.h),
+                child: Column(
+                  children: [
+                    if (isNew) ...[
+                      Text(
+                        'new_record'.tr,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFFE65100),
+                        ),
                       ),
-                      Divider(height: 16.h),
-                      _StatRow(
-                        label: 'result_accuracy'.tr,
-                        value: '$accuracy%',
-                        color: accuracy >= 80
-                            ? const Color(0xFF2E7D32)
-                            : accuracy >= 60
+                      SizedBox(height: 4.h),
+                    ],
+                    Text(
+                      'challenge_result_title'.tr,
+                      style: TextStyle(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.w800,
+                        color: cs.primary,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(16.r),
+                      decoration: BoxDecoration(
+                        color: cs.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Column(
+                        children: [
+                          _StatRow(
+                            label: 'challenge_score'.tr,
+                            value: '$score',
+                            color: cs.primary,
+                            bold: true,
+                            animateValue: true,
+                            valueKey: score,
+                          ),
+                          Divider(height: 16.h),
+                          _StatRow(
+                            label: 'result_accuracy'.tr,
+                            value: '$accuracy%',
+                            color: accuracy >= 80
+                                ? const Color(0xFF2E7D32)
+                                : accuracy >= 60
                                 ? const Color(0xFFE65100)
                                 : cs.error,
+                          ),
+                          Divider(height: 16.h),
+                          _StatRow(
+                            label: 'best_challenge_score'.tr,
+                            value: '$best',
+                            color: const Color(0xFFE65100),
+                          ),
+                        ],
                       ),
-                      Divider(height: 16.h),
-                      _StatRow(
-                        label: 'best_challenge_score'.tr,
-                        value: '$best',
-                        color: const Color(0xFFE65100),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 16.h),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: () => Get.back(),
-                    child: Text('home'.tr),
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [cs.primary, cs.tertiary]),
-                      borderRadius: BorderRadius.circular(12.r),
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12.r),
-                        onTap: () {
-                          Get.back();
-                          controller.startChallenge();
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12.h),
-                          child: Center(
-                            child: Text(
-                              'play_again'.tr,
-                              style: TextStyle(
-                                color: cs.onPrimary,
-                                fontWeight: FontWeight.w600,
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 16.h),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Get.back(),
+                        child: Text('home'.tr),
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: cs.primary,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12.r),
+                            onTap: () {
+                              Get.back();
+                              controller.startChallenge();
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              child: Center(
+                                child: Text(
+                                  'play_again'.tr,
+                                  style: TextStyle(
+                                    color: cs.onPrimary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    )
+        )
         .animate()
         .fadeIn(duration: 300.ms)
         .slideY(begin: 0.2, end: 0, duration: 300.ms, curve: Curves.easeOut);
@@ -363,13 +361,13 @@ class _StatRow extends StatelessWidget {
         ),
         animateValue && valueKey != null
             ? valueText
-                .animate(key: ValueKey(valueKey))
-                .scale(
-                  begin: const Offset(1.3, 1.3),
-                  end: const Offset(1.0, 1.0),
-                  duration: 200.ms,
-                  curve: Curves.easeOut,
-                )
+                  .animate(key: ValueKey(valueKey))
+                  .scale(
+                    begin: const Offset(1.3, 1.3),
+                    end: const Offset(1.0, 1.0),
+                    duration: 200.ms,
+                    curve: Curves.easeOut,
+                  )
             : valueText,
       ],
     );

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -13,20 +13,10 @@ class HistoryPage extends GetView<HistoryController> {
     final cs = Get.theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: cs.surface,
       body: SafeArea(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                cs.surface,
-                cs.surfaceContainerLowest.withValues(alpha: 0.95),
-                cs.surfaceContainerLow.withValues(alpha: 0.9),
-              ],
-            ),
-          ),
+        child: ColoredBox(
+          color: cs.surface,
           child: Column(
             children: [
               _buildHeader(context, cs),
@@ -102,7 +92,9 @@ class HistoryPage extends GetView<HistoryController> {
                                 width: 40.r,
                                 height: 40.r,
                                 decoration: BoxDecoration(
-                                  color: cs.primaryContainer.withValues(alpha: 0.45),
+                                  color: cs.primaryContainer.withValues(
+                                    alpha: 0.45,
+                                  ),
                                   borderRadius: BorderRadius.circular(12.r),
                                 ),
                                 child: Icon(
@@ -181,11 +173,7 @@ class HistoryPage extends GetView<HistoryController> {
           IconButton(
             onPressed: controller.clearAll,
             tooltip: 'clear_all'.tr,
-            icon: Icon(
-              LucideIcons.trash2,
-              size: 20.r,
-              color: cs.error,
-            ),
+            icon: Icon(LucideIcons.trash2, size: 20.r, color: cs.error),
           ),
         ],
       ),
@@ -221,4 +209,3 @@ class HistoryPage extends GetView<HistoryController> {
     return LucideIcons.history;
   }
 }
-

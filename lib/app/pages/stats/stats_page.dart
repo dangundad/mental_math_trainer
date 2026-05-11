@@ -14,20 +14,10 @@ class StatsPage extends GetView<StatsController> {
     final cs = Get.theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: cs.surface,
       body: SafeArea(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                cs.surface,
-                cs.surfaceContainerLowest.withValues(alpha: 0.94),
-                cs.surfaceContainerLow.withValues(alpha: 0.9),
-              ],
-            ),
-          ),
+        child: ColoredBox(
+          color: cs.surface,
           child: Column(
             children: [
               Padding(
@@ -67,12 +57,30 @@ class StatsPage extends GetView<StatsController> {
                         _MetricCard(
                           cs: cs,
                           entries: [
-                            _MetricData('total_events'.tr, '${controller.totalEvents.value}'),
-                            _MetricData('today_events'.tr, '${controller.todayEvents.value}'),
-                            _MetricData('week_events'.tr, '${controller.weekEvents.value}'),
-                            _MetricData('open_stats'.tr, '${controller.openStatsCount.value}'),
-                            _MetricData('unique_routes'.tr, '${controller.uniqueRoutes.value}'),
-                            _MetricData('unique_screens'.tr, '${controller.uniqueScreens.value}'),
+                            _MetricData(
+                              'total_events'.tr,
+                              '${controller.totalEvents.value}',
+                            ),
+                            _MetricData(
+                              'today_events'.tr,
+                              '${controller.todayEvents.value}',
+                            ),
+                            _MetricData(
+                              'week_events'.tr,
+                              '${controller.weekEvents.value}',
+                            ),
+                            _MetricData(
+                              'open_stats'.tr,
+                              '${controller.openStatsCount.value}',
+                            ),
+                            _MetricData(
+                              'unique_routes'.tr,
+                              '${controller.uniqueRoutes.value}',
+                            ),
+                            _MetricData(
+                              'unique_screens'.tr,
+                              '${controller.uniqueScreens.value}',
+                            ),
                           ],
                         ),
                         SizedBox(height: 16.h),
@@ -95,8 +103,11 @@ class StatsPage extends GetView<StatsController> {
                                   ),
                                 )
                               : Column(
-                                  children: controller.topEventNames.map((name) {
-                                    final count = controller.eventCountMap[name] ?? 0;
+                                  children: controller.topEventNames.map((
+                                    name,
+                                  ) {
+                                    final count =
+                                        controller.eventCountMap[name] ?? 0;
                                     return _TopEventRow(
                                       event: name,
                                       count: count,
@@ -158,10 +169,7 @@ class _WeeklyChart extends StatelessWidget {
           SizedBox(height: 4.h),
           Text(
             'weekly_chart_subtitle'.tr,
-            style: TextStyle(
-              fontSize: 11.sp,
-              color: cs.onSurfaceVariant,
-            ),
+            style: TextStyle(fontSize: 11.sp, color: cs.onSurfaceVariant),
           ),
           SizedBox(height: 16.h),
           SizedBox(
@@ -176,7 +184,10 @@ class _WeeklyChart extends StatelessWidget {
                 return Center(
                   child: Text(
                     'no_data'.tr,
-                    style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13.sp),
+                    style: TextStyle(
+                      color: cs.onSurfaceVariant,
+                      fontSize: 13.sp,
+                    ),
                   ),
                 );
               }
@@ -190,13 +201,11 @@ class _WeeklyChart extends StatelessWidget {
                   barRods: [
                     BarChartRodData(
                       toY: val,
-                      gradient: LinearGradient(
-                        colors: [cs.primary, cs.tertiary],
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                      ),
+                      color: cs.primary,
                       width: 22.w,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(6.r)),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(6.r),
+                      ),
                       backDrawRodData: BackgroundBarChartRodData(
                         show: true,
                         toY: maxY,
@@ -210,8 +219,20 @@ class _WeeklyChart extends StatelessWidget {
               final dayLabels = keys.map((k) {
                 final parts = k.split('-');
                 if (parts.length != 3) return k;
-                final date = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
-                const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                final date = DateTime(
+                  int.parse(parts[0]),
+                  int.parse(parts[1]),
+                  int.parse(parts[2]),
+                );
+                const weekdays = [
+                  'Mon',
+                  'Tue',
+                  'Wed',
+                  'Thu',
+                  'Fri',
+                  'Sat',
+                  'Sun',
+                ];
                 return weekdays[date.weekday - 1];
               }).toList();
 
@@ -260,16 +281,25 @@ class _WeeklyChart extends StatelessWidget {
                         reservedSize: 30.w,
                         interval: maxY / 5,
                         getTitlesWidget: (value, meta) {
-                          if (value == 0 || value == maxY) return const SizedBox.shrink();
+                          if (value == 0 || value == maxY) {
+                            return const SizedBox.shrink();
+                          }
                           return Text(
                             value.toInt().toString(),
-                            style: TextStyle(fontSize: 9.sp, color: cs.onSurfaceVariant),
+                            style: TextStyle(
+                              fontSize: 9.sp,
+                              color: cs.onSurfaceVariant,
+                            ),
                           );
                         },
                       ),
                     ),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                   ),
                   barTouchData: BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
@@ -309,10 +339,7 @@ class _MetricCard extends StatelessWidget {
   final ColorScheme cs;
   final List<_MetricData> entries;
 
-  const _MetricCard({
-    required this.cs,
-    required this.entries,
-  });
+  const _MetricCard({required this.cs, required this.entries});
 
   @override
   Widget build(BuildContext context) {
@@ -415,7 +442,10 @@ class _SectionCard extends StatelessWidget {
             ),
           ),
           const Divider(height: 1),
-          Padding(padding: EdgeInsets.symmetric(vertical: 4.h), child: child),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 4.h),
+            child: child,
+          ),
         ],
       ),
     );
@@ -441,11 +471,7 @@ class _TopEventRow extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
       child: Row(
         children: [
-          Icon(
-            LucideIcons.clock3,
-            size: 16.r,
-            color: cs.primary,
-          ),
+          Icon(LucideIcons.clock3, size: 16.r, color: cs.primary),
           SizedBox(width: 10.w),
           Expanded(
             child: Text(
