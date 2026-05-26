@@ -2,7 +2,7 @@
 
 > 문서: `AGENTS.md`
 > This file provides guidance to coding agents working with this repository.
-> 최종 업데이트: 2026-03-08
+> 최종 업데이트: 2026-05-27
 > 기준: 현재 앱 저장소 스캔 + `C:\Flutter_WorkSpace\Flutter_Plan\AGENTS.md` 포트폴리오 상태표
 
 ## 프로젝트 요약
@@ -39,9 +39,10 @@ flutter run
 ```
 
 ## 현재 의존성 하이라이트
-- 기반: `get` ^4.7.3, `hive_ce` ^2.19.3, `hive_ce_flutter` ^2.3.4, `path_provider` ^2.1.5, `intl` ^0.20.2, `uuid` ^4.5.3
-- UI/UX: `flutter_screenutil` ^5.9.3, `flex_color_scheme` ^8.4.0, `google_fonts` ^6.3.2, `lucide_icons_flutter` ^3.1.10, `flutter_animate` ^4.5.2, `fl_chart` ^0.70.2, `confetti` ^0.7.0
-- 수익화/운영: `google_mobile_ads` ^6.0.0, `gma_mediation_applovin` ^2.5.1, `gma_mediation_pangle` ^3.5.0, `gma_mediation_unity` ^1.6.2, `in_app_purchase` ^3.2.3, `in_app_review` ^2.0.11, `rate_my_app` ^2.3.2, `firebase_core` ^4.4.0, `firebase_analytics` ^12.1.2, `firebase_crashlytics` ^5.0.7, `device_info_plus` ^12.3.0, `package_info_plus` ^9.0.0, `permission_handler` ^12.0.1, `share_plus` ^12.0.1, `url_launcher` ^6.3.2, `wakelock_plus` ^1.4.0, `vibration` ^3.1.8
+- 기반: `get` ^4.7.3, `hive_ce` ^2.19.3, `hive_ce_flutter` ^2.3.4, `path_provider` ^2.1.5, `intl` ^0.20.2
+- UI/UX: `flutter_screenutil` ^5.9.3, `flex_color_scheme` ^8.4.0, `google_fonts` ^8.0.2, `lucide_icons_flutter` ^3.1.14+2, `flutter_animate` ^4.5.2, `fl_chart` ^1.2.0, `confetti` ^0.8.0
+- 수익화/운영: `google_mobile_ads` ^8.0.0, `gma_mediation_applovin` ^2.6.0, `gma_mediation_pangle` ^3.6.0, `gma_mediation_unity` ^1.7.0, `in_app_purchase` ^3.2.3, `in_app_review` ^2.0.12, `rate_my_app` ^2.3.2, `vibration` ^3.1.8
+- 직접 제거됨: `firebase_core`, `firebase_analytics`, `firebase_crashlytics`, `device_info_plus`, `package_info_plus`, `permission_handler`, `share_plus`, `url_launcher`, `uuid`, `wakelock_plus`
 
 ## 현재 코드 구조
 - `lib/app` 디렉터리: `admob`, `bindings`, `controllers`, `data`, `pages`, `routes`, `services`, `theme`, `translate`, `utils`, `widgets`
@@ -62,7 +63,10 @@ flutter run
 - `data/constants`: 없음
 - `data` 루트 파일: 없음
 - `assets`: `data`, `fonts`, `images`
-- `tests`: 1개: `test/widget_test.dart`
+- `tests`: 3개 파일/4개 테스트: `test/app/controllers/game_controller_test.dart`, `test/ui/no_gradient_usage_test.dart`, `test/widget_test.dart`
+
+## 최근 감사 이력
+- 2026-05-27 Phase 1~4 Wave 2B 사전배포 감사 통과: pub.dev 직접 확인 기반 direct/dev 의존성 최신화, 미사용 Firebase/FlutterFire/device_info_plus/package_info_plus/permission_handler/wakelock_plus/uuid/url_launcher 직접 의존성 제거, `intl`/`fl_chart` 직접 의존성 유지, Android debug resource/assemble 검증 통과
 
 ## 문서 유지 규칙
 - 새 페이지나 바인딩을 추가하면 이 문서의 `pages`/`bindings` 요약도 함께 갱신합니다.
