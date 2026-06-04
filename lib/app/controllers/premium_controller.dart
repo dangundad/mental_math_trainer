@@ -1,4 +1,4 @@
-﻿import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:mental_math_trainer/app/services/purchase_service.dart';
 
 class PremiumPlan {
@@ -19,23 +19,23 @@ class PremiumPlan {
 class PremiumController extends GetxController {
   final PurchaseService purchaseService = PurchaseService.to;
 
-  final RxInt selectedPlanIndex = 1.obs;
+  final RxInt selectedPlanIndex = 0.obs;
 
   final List<PremiumPlan> plans = const [
     PremiumPlan(
       titleKey: 'premium_plan_weekly',
       descKey: 'premium_plan_weekly_desc',
-      fallbackPrice: '￦1,900',
+      fallbackPrice: '₩3,000',
     ),
     PremiumPlan(
       titleKey: 'premium_plan_monthly',
       descKey: 'premium_plan_monthly_desc',
-      fallbackPrice: '￦5,900',
+      fallbackPrice: '₩7,000',
     ),
     PremiumPlan(
       titleKey: 'premium_plan_yearly',
       descKey: 'premium_plan_yearly_desc',
-      fallbackPrice: '￦9,900',
+      fallbackPrice: '₩14,000',
     ),
   ];
 
@@ -73,7 +73,8 @@ class PremiumController extends GetxController {
     return purchaseService.getProductPrice(index, plans[index].fallbackPrice);
   }
 
-  String get premiumPriceWithFallback => purchaseService.premiumPriceWithFallback;
+  String get premiumPriceWithFallback =>
+      purchaseService.premiumPriceWithFallback;
 
   void toggleDevPremium() {
     purchaseService.toggleDevPremium();
